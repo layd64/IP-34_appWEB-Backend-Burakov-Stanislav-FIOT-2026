@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профіль - BookStore Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html" aria-label="Go to home">
+                    <h1>BookStore Pro</h1>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Головна</a></li>
+                <li><a href="catalog.html#catalog-title">Каталог</a></li>
+                <li><a href="index.html#categories">Категорії</a></li>
+                <li id="authNavItem">
+                    <a href="profile.html" id="profileLink">Профіль</a>
+                </li>
+                <li>
+                    <a href="#" id="cartBtn" class="cart-btn">
+                        Кошик <span id="cartCount" class="cart-count">0</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="burger-menu">
+                <div class="burger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+        <div class="mobile-menu">
+            <ul class="mobile-nav-links">
+                <li><a href="index.html">Головна</a></li>
+                <li><a href="catalog.html#catalog-title">Каталог</a></li>
+                <li><a href="index.html#categories">Категорії</a></li>
+                <li id="mobileAuthNavItem">
+                    <a href="profile.html" id="mobileProfileLink">Профіль</a>
+                </li>
+                <li><a href="#" id="mobileCartBtn">Кошик <span id="mobileCartCount">(0)</span></a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main>
+        <section class="profile-section">
+            <div class="profile-container">
+                <h2>Мій профіль</h2>
+
+                <div id="profileContent" class="settings-grid">
+                    <div class="profile-info">
+                        <div class="profile-header">
+                            <h3>Особиста інформація</h3>
+                            <button id="editBtn" class="edit-btn" aria-label="Редагувати">
+                                <svg viewBox="0 0 24 24" class="edit-icon">
+                                    <path
+                                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <form id="profileForm" class="profile-form">
+                            <div class="form-group">
+                                <label for="fullName">Повне ім'я</label>
+                                <input type="text" id="fullName" name="fullName" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Електронна пошта</label>
+                                <input type="email" id="email" name="email" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone">Телефон</label>
+                                <input type="tel" id="phone" name="phone" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="address">Адреса</label>
+                                <input type="text" id="address" name="address" readonly>
+                            </div>
+
+                            <div id="saveButtons">
+                                <button type="submit" class="auth-btn" disabled>Зберегти зміни</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="action-card">
+                        <h3>Змінити пароль</h3>
+                        <form id="passwordForm" class="profile-form">
+                            <div class="form-group">
+                                <label for="oldPassword">Поточний пароль</label>
+                                <input type="password" id="oldPassword" name="oldPassword" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newPassword">Новий пароль</label>
+                                <input type="password" id="newPassword" name="newPassword" required minlength="6">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="confirmNewPassword">Підтвердження нового пароля</label>
+                                <input type="password" id="confirmNewPassword" name="confirmNewPassword" required>
+                            </div>
+
+                            <button type="submit" class="auth-btn">Змінити пароль</button>
+                        </form>
+                    </div>
+
+                    <div class="action-card">
+                        <h3>Обліковий запис</h3>
+                        <p class="account-info">Дата реєстрації: <span id="createdAt"></span></p>
+                        <button id="logoutBtn" class="logout-btn">Вийти</button>
+                        <button id="logoutClearBtn" class="logout-clear-btn">Вийти та очистити localStorage</button>
+                    </div>
+                </div>
+
+                <div class="favorites-section-container">
+                    <h3>Мої Улюблені Книги</h3>
+                    <div id="favoritesGrid" class="favorites-grid">
+                        <!-- favorites list -->
+                    </div>
+                </div>
+
+                <div id="notAuthenticated" style="display: none;">
+                    <p>Будь ласка, увійдіть до свого облікового запису.</p>
+                    <a href="login.html" class="auth-btn">Увійти</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="cartModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content cart-modal-content">
+            <button class="modal-close" aria-label="Close modal">&times;</button>
+            <div class="cart-modal-body">
+                <h2>Ваш Кошик</h2>
+                <div class="cart-items-container">
+                    <!-- cart items -->
+                    <p class="empty-cart-message">Ваш кошик порожній</p>
+                </div>
+                <div class="cart-pagination"></div>
+                <div class="cart-footer">
+                    <div class="cart-total">
+                        <span>Разом:</span>
+                        <span id="cartTotalAmount">0 грн</span>
+                    </div>
+                    <button class="checkout-btn">ОФОРМИТИ ЗАМОВЛЕННЯ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>BookStore Pro</h3>
+                <p>Ваша цифрова бібліотека сучасного світу</p>
+            </div>
+            <div class="footer-section">
+                <h4>Швидкі посилання</h4>
+                <ul>
+                    <li><a href="index.html">Головна</a></li>
+                    <li><a href="catalog.html#catalog-title">Каталог</a></li>
+                    <li><a href="index.html#categories">Категорії</a></li>
+                    <li><a href="profile.html">Профіль</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Контактна інформація</h4>
+                <p>Бураков Станіслав ІП-34</p>
+                <p>Телефон: +1 (555) 111-1111</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/toast.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/profile.js"></script>
+</body>
+
+</html>

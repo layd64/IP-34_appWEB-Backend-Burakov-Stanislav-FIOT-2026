@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookStore Pro - Ваша цифрова бібліотека</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="#" aria-label="Go to home">
+                    <h1>BookStore Pro</h1>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Головна</a></li>
+                <li><a href="catalog.html#catalog-title">Каталог</a></li>
+                <li><a href="#categories">Категорії</a></li>
+                <li id="authNavItem">
+                    <a href="login.html" id="loginLink">Вхід</a>
+                </li>
+                <li>
+                    <a href="#" id="cartBtn" class="cart-btn">
+                        Кошик <span id="cartCount" class="cart-count">0</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="burger-menu">
+                <div class="burger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+        <div class="mobile-menu">
+            <ul class="mobile-nav-links">
+                <li><a href="#home">Головна</a></li>
+                <li><a href="catalog.html#catalog-title">Каталог</a></li>
+                <li><a href="#categories">Категорії</a></li>
+                <li id="mobileAuthNavItem">
+                    <a href="login.html" id="mobileLoginLink">Вхід</a>
+                </li>
+                <li><a href="#" id="mobileCartBtn">Кошик <span id="mobileCartCount">(0)</span></a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h2>Welcome!</h2>
+                    <h3>Ласкаво просимо до BookStore Pro!</h3>
+                    <p>Ваш найкращий цифровий досвід читання.</p>
+                    <div class="button-container">
+                        <a href="catalog.html#catalog-title"><button type="button">Перейти до каталогу</button></a>
+                    </div>
+                </div>
+                <div class="hero-image-container">
+                    <img src="assets/stackOfBooks2.png" alt="Modern Library Interior" class="hero-image">
+                </div>
+            </div>
+        </section>
+
+        <section id="books" class="featured-books">
+            <div class="section-heading">
+                <h2>Рекомендовані книги</h2>
+                <p class="section-subtitle">Добірка, яку ми радимо переглянути першою.</p>
+            </div>
+            <div class="books-grid">
+                <div class="book-card"
+                    data-description="Збірка віршів видатного українського поета Тараса Шевченка. 'Кобзар' є символом боротьби українського народу за свободу і незалежність, втіленням народної мудрості та духовності."
+                    data-book-id="1">
+                    <a href="book.html?id=1" class="book-card-link">
+                        <img src="assets/kobzar.png" alt="Кобзар" class="book-image">
+                        <h3>Кобзар</h3>
+                        <p class="book-author">Тарас Шевченко</p>
+                        <p class="book-price">300 грн</p>
+                        <div class="book-rating-card">
+                            <span class="book-rating-stars">⭐⭐⭐⭐⭐</span>
+                            <span class="book-rating-value">5.0</span>
+                        </div>
+                    </a>
+                    <div class="card-actions">
+                        <button class="add-to-cart-btn" data-book-id="1">В КОШИК</button>
+                        <button class="favorite-btn" data-book-id="1" aria-label="Add to favorites">
+                            <svg viewBox="0 0 24 24" class="heart-icon">
+                                <path
+                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="book-card"
+                    data-description="Соціально-побутова повість Івана Нечуя-Левицького про непросте життя селянської родини. Гумористичний та водночас драматичний твір, що розкриває традиції та звичаї українського села XIX століття."
+                    data-book-id="2">
+                    <a href="book.html?id=2" class="book-card-link">
+                        <img src="assets/book2.png" alt="Кайдашева сім'я" class="book-image">
+                        <h3>Кайдашева сім'я</h3>
+                        <p class="book-author">Іван Нечуй-Левицький</p>
+                        <p class="book-price">450 грн</p>
+                        <div class="book-rating-card">
+                            <span class="book-rating-stars">⭐⭐⭐⭐</span>
+                            <span class="book-rating-value">4.0</span>
+                        </div>
+                    </a>
+                    <div class="card-actions">
+                        <button class="add-to-cart-btn" data-book-id="2">В КОШИК</button>
+                        <button class="favorite-btn" data-book-id="2" aria-label="Add to favorites">
+                            <svg viewBox="0 0 24 24" class="heart-icon">
+                                <path
+                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="book-card"
+                    data-description="Іван Котляревський створив травестійну поему на основі 'Енеїди' Вергілія. Це перший твір написаний живою українською мовою, що поклав початок новій українській літературі. Гумористичний твір про пригоди троянців."
+                    data-book-id="3">
+                    <a href="book.html?id=3" class="book-card-link">
+                        <img src="assets/book3.png" alt="Енеїда" class="book-image">
+                        <h3>Енеїда</h3>
+                        <p class="book-author">Іван Котляревський</p>
+                        <p class="book-price">249 грн</p>
+                        <div class="book-rating-card">
+                            <span class="book-rating-stars">⭐⭐⭐⭐⭐</span>
+                            <span class="book-rating-value">5.0</span>
+                        </div>
+                    </a>
+                    <div class="card-actions">
+                        <button class="add-to-cart-btn" data-book-id="3">В КОШИК</button>
+                        <button class="favorite-btn" data-book-id="3" aria-label="Add to favorites">
+                            <svg viewBox="0 0 24 24" class="heart-icon">
+                                <path
+                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="view-more-container">
+                <div class="button-container">
+                    <a href="catalog.html#catalog-title"><button class="view-more-btn">Переглянути більше
+                            книг</button></a>
+                </div>
+            </div>
+        </section>
+
+        <section id="categories" class="categories">
+            <div class="section-heading">
+                <h2>Категорії книг</h2>
+                <p class="section-subtitle">Підберіть ідеальну книгу за темою, настроєм чи форматом читання.</p>
+            </div>
+
+            <div class="categories-grid">
+                <div class="category-card" data-genre="Художня література">
+                    <div class="category-header">
+                        <div class="category-icon">📚</div>
+                        <h3>Художня література</h3>
+                    </div>
+                    <div class="category-content">
+                        <p>Романи та повісті, що занурюють у нові світи й героїв.</p>
+                        <div class="category-meta">
+                            <a class="pill-link"
+                                href="catalog.html?category=Художня література#catalog-title">Переглянути</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-card" data-genre="Наукова фантастика">
+                    <div class="category-header">
+                        <div class="category-icon">🚀</div>
+                        <h3>Наукова фантастика</h3>
+                    </div>
+                    <div class="category-content">
+                        <p>Подорожі у майбутнє, інновації та сміливі ідеї.</p>
+                        <div class="category-meta">
+                            <a class="pill-link"
+                                href="catalog.html?category=Наукова фантастика#catalog-title">Переглянути</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-card" data-genre="Детектив">
+                    <div class="category-header">
+                        <div class="category-icon">🕵️</div>
+                        <h3>Детективи та трилери</h3>
+                    </div>
+                    <div class="category-content">
+                        <p>Сюжети з інтригою, загадками та неочікуваними фіналами.</p>
+                        <div class="category-meta">
+                            <a class="pill-link" href="catalog.html?category=Детектив#catalog-title">Переглянути</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-card" data-genre="Романтика">
+                    <div class="category-header">
+                        <div class="category-icon">💛</div>
+                        <h3>Романтика</h3>
+                    </div>
+                    <div class="category-content">
+                        <p>Історії про кохання, почуття та сильні емоції.</p>
+                        <div class="category-meta">
+                            <a class="pill-link" href="catalog.html?category=Романтика#catalog-title">Переглянути</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-card" data-genre="Біографія">
+                    <div class="category-header">
+                        <div class="category-icon">🎬</div>
+                        <h3>Біографії</h3>
+                    </div>
+                    <div class="category-content">
+                        <p>Шлях видатних людей, мотиваційні історії та факти.</p>
+                        <div class="category-meta">
+                            <a class="pill-link" href="catalog.html?category=Біографія#catalog-title">Переглянути</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-card" data-genre="Саморозвиток">
+                    <div class="category-header">
+                        <div class="category-icon">🎯</div>
+                        <h3>Саморозвиток</h3>
+                    </div>
+                    <div class="category-content">
+                        <p>Поради, методики та практики для зростання щодня.</p>
+                        <div class="category-meta">
+                            <a class="pill-link" href="catalog.html?category=Саморозвиток#catalog-title">Переглянути</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-card" data-genre="Поезія">
+                    <div class="category-header">
+                        <div class="category-icon">📝</div>
+                        <h3>Поезія</h3>
+                    </div>
+                    <div class="category-content">
+                        <p>Вірші та поеми, що передають найтонші емоції та образи.</p>
+                        <div class="category-meta">
+                            <a class="pill-link" href="catalog.html?category=Поезія#catalog-title">Переглянути</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-card" data-genre="Фентезі">
+                    <div class="category-header">
+                        <div class="category-icon">🐉</div>
+                        <h3>Фентезі</h3>
+                    </div>
+                    <div class="category-content">
+                        <p>Магічні світи, легенди та захопливі пригоди героїв.</p>
+                        <div class="category-meta">
+                            <a class="pill-link" href="catalog.html?category=Фентезі#catalog-title">Переглянути</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="reading-stats">
+            <div class="section-heading">
+                <h2>Статистика читання</h2>
+                <p class="section-subtitle">Короткий зріз того, хто читає найчастіше.</p>
+            </div>
+            <div class="stats-content">
+                <h3>Країни-лідери за читанням</h3>
+
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Сполучені Штати</td>
+                            <td>45% від загальної кількості читачів</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Великобританія</td>
+                            <td>18% від загальної кількості читачів</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Канада</td>
+                            <td>12% від загальної кількості читачів</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Австралія</td>
+                            <td>8% від загальної кількості читачів</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Німеччина</td>
+                            <td>7% від загальної кількості читачів</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="newsletter">
+            <div class="newsletter-container">
+                <form class="newsletter-form" action="#" method="POST">
+                    <h2>Залишайтеся в курсі</h2>
+                    <h3>Підпишіться на нашу розсилку</h3>
+                    <div class="form-group">
+                        <label for="name">Повне ім'я</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Електрона пошта</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interests">Інтереси читання</label>
+                        <select id="interests" name="interests">
+                            <option value="fiction">Художня література</option>
+                            <option value="non-fiction">Нехудожня література</option>
+                            <option value="sci-fi">Наукова фантастика</option>
+                            <option value="mystery">Детективи</option>
+                            <option value="romance">Романтика</option>
+                            <option value="biography">Біографії</option>
+                            <option value="all">Всі жанри</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="notifications" value="yes">
+                            Я хочу отримувати сповіщення про нові видання
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="promotions" value="yes">
+                            Я хочу отримувати рекламні пропозиції
+                        </label>
+                    </div>
+
+                    <button type="submit">Підписатися зараз!</button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="bookModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">&times;</button>
+            <div class="modal-body">
+                <img id="modalImage" src="" alt="Book Cover" class="modal-image">
+                <div class="modal-info">
+                    <p id="modalPrice" class="modal-price"></p>
+                    <h2 id="modalTitle" class="modal-title"></h2>
+                    <p id="modalAuthor" class="modal-author"></p>
+                    <p id="modalDescription" class="modal-description"></p>
+                    <button class="modal-cart-btn">В КОШИК</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cartModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content cart-modal-content">
+            <button class="modal-close" aria-label="Close modal">&times;</button>
+            <div class="cart-modal-body">
+                <h2>Ваш Кошик</h2>
+                <div class="cart-items-container">
+                    <!-- cart items -->
+                    <p class="empty-cart-message">Ваш кошик порожній</p>
+                </div>
+                <div class="cart-pagination"></div>
+                <div class="cart-footer">
+                    <div class="cart-total">
+                        <span>Разом:</span>
+                        <span id="cartTotalAmount">0 грн</span>
+                    </div>
+                    <button class="checkout-btn">ОФОРМИТИ ЗАМОВЛЕННЯ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>BookStore Pro</h3>
+                <p>Ваша цифрова бібліотека сучасного світу</p>
+            </div>
+            <div class="footer-section">
+                <h4>Швидкі посилання</h4>
+                <ul>
+                    <li><a href="index.html">Головна</a></li>
+                    <li><a href="catalog.html#catalog-title">Каталог</a></li>
+                    <li><a href="index.html#categories">Категорії</a></li>
+                    <li><a href="profile.html">Профіль</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Контактна інформація</h4>
+                <p>Бураков Станіслав ІП-34</p>
+                <p>Телефон: +1 (555) 111-1111</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/toast.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/script.js"></script>
+</body>
+
+</html>

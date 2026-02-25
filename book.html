@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Деталі книги - BookStore Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html" aria-label="Go to home">
+                    <h1>BookStore Pro</h1>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Головна</a></li>
+                <li><a href="catalog.html#catalog-title">Каталог</a></li>
+                <li><a href="index.html#categories">Категорії</a></li>
+                <li id="authNavItem">
+                    <a href="login.html" id="loginLink">Вхід</a>
+                </li>
+                <li>
+                    <a href="#" id="cartBtn" class="cart-btn">
+                        Кошик <span id="cartCount" class="cart-count">0</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="burger-menu">
+                <div class="burger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+        <div class="mobile-menu">
+            <ul class="mobile-nav-links">
+                <li><a href="index.html">Головна</a></li>
+                <li><a href="catalog.html#catalog-title">Каталог</a></li>
+                <li><a href="index.html#categories">Категорії</a></li>
+                <li id="mobileAuthNavItem">
+                    <a href="login.html" id="mobileLoginLink">Вхід</a>
+                </li>
+                <li><a href="#" id="mobileCartBtn">Кошик <span id="mobileCartCount">(0)</span></a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main>
+        <section class="book-details-section">
+            <div class="book-details-container">
+                <a href="catalog.html#catalog-title" class="back-link">← Повернутися до каталогу</a>
+
+                <div id="bookDetails" class="book-details-content">
+                    <!-- book details -->
+                </div>
+
+                <div id="reviewsSection" class="reviews-section">
+                    <h3>Відгуки</h3>
+                    <div id="averageRating" class="average-rating">
+                        <!-- average rating -->
+                    </div>
+
+                    <div id="reviewsList" class="reviews-list">
+                        <!-- reviews list -->
+                    </div>
+
+                    <div id="addReviewForm" class="add-review-form">
+                        <h4>Залишити відгук</h4>
+                        <form id="reviewForm">
+                            <div class="form-group">
+                                <label for="reviewRating">Ваша оцінка<span class="required-star">*</span></label>
+                                <div class="rating-input">
+                                    <input type="radio" id="rating5" name="rating" value="5" required>
+                                    <label for="rating5">☆</label>
+                                    <input type="radio" id="rating4" name="rating" value="4" required>
+                                    <label for="rating4">☆</label>
+                                    <input type="radio" id="rating3" name="rating" value="3" required>
+                                    <label for="rating3">☆</label>
+                                    <input type="radio" id="rating2" name="rating" value="2" required>
+                                    <label for="rating2">☆</label>
+                                    <input type="radio" id="rating1" name="rating" value="1" required>
+                                    <label for="rating1">☆</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="reviewText">Ваш відгук<span class="required-star">*</span></label>
+                                <textarea id="reviewText" name="reviewText" rows="5" required
+                                    placeholder="Напишіть ваш відгук про книгу..."></textarea>
+                            </div>
+
+                            <div id="reviewErrorMessage" class="error-message" style="display: none;"></div>
+                            <div id="reviewSuccessMessage" class="success-message" style="display: none;"></div>
+
+                            <button type="submit" class="auth-btn">Опублікувати відгук</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="cartModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content cart-modal-content">
+            <button class="modal-close" aria-label="Close modal">&times;</button>
+            <div class="cart-modal-body">
+                <h2>Ваш Кошик</h2>
+                <div class="cart-items-container">
+                    <!-- cart items -->
+                    <p class="empty-cart-message">Ваш кошик порожній</p>
+                </div>
+                <div class="cart-pagination"></div>
+                <div class="cart-footer">
+                    <div class="cart-total">
+                        <span>Разом:</span>
+                        <span id="cartTotalAmount">0 грн</span>
+                    </div>
+                    <button class="checkout-btn">ОФОРМИТИ ЗАМОВЛЕННЯ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>BookStore Pro</h3>
+                <p>Ваша цифрова бібліотека сучасного світу</p>
+            </div>
+            <div class="footer-section">
+                <h4>Швидкі посилання</h4>
+                <ul>
+                    <li><a href="index.html">Головна</a></li>
+                    <li><a href="catalog.html#catalog-title">Каталог</a></li>
+                    <li><a href="index.html#categories">Категорії</a></li>
+                    <li><a href="profile.html">Профіль</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Контактна інформація</h4>
+                <p>Бураков Станіслав ІП-34</p>
+                <p>Телефон: +1 (555) 111-1111</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/toast.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/book-details.js"></script>
+</body>
+
+</html>
