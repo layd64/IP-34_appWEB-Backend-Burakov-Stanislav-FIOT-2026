@@ -1,4 +1,5 @@
 const express = require('express');
+const { sequelize, User, Order } = require('./models/index');
 const app = express();
 const PORT = 3000;
 
@@ -72,7 +73,45 @@ app.delete('/students/:id', (req, res) => {
   res.json({ message: `Студента з id=${studentId} видалено`, student: deleted[0] });
 });
 
-// Запуск сервера
-app.listen(PORT, () => {
-  console.log(`Сервер запущено на http://localhost:${PORT}`);
+// Завдання: Sequelize ORM. Отримати всіх користувачів разом з їхніми замовленнями
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await User.findAll({ include: 'orders' });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Додати нового користувача
+app.post('/api/users', async (req, res) => {
+  try {
+    const { username, email } = req.body;
+    const newUser = await User.create({ username, email });
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Додати нове замовлення для користувача
+app.post('/api/users/:userId/orders', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { total_amount, status } = req.body;
+    const newOrder = await Order.create({ total_amount, status, user_id: userId });
+    res.status(201).json(newOrder);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Синхронізація з БД та запуск сервера
+sequelize.sync({ alter: true }).then(() => {
+  console.log('Підключення до бази даних через Sequelize успішне, моделі синхронізовані.');
+  app.listen(PORT, () => {
+    console.log(`Сервер запущено на http://localhost:${PORT}`);
+  });
+}).catch(err => {
+  console.error('Помилка підключення до бази даних:', err);
 });
