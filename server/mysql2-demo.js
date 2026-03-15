@@ -31,6 +31,8 @@ async function runTasks() {
             user_id INT,
             total_amount DECIMAL(10, 2) NOT NULL,
             status VARCHAR(50) DEFAULT 'pending',
+            createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         );
     `);
@@ -45,7 +47,7 @@ async function runTasks() {
     const [[user]] = await connection.query(`SELECT id FROM users WHERE email = 'ivan@example.com' LIMIT 1;`);
     const userId = user.id;
 
-    await connection.query(`INSERT INTO orders (user_id, total_amount, status) VALUES (?, 450.00, 'completed');`, [userId]);
+    await connection.query(`INSERT INTO orders (user_id, total_amount, status, createdAt, updatedAt) VALUES (?, 450.00, 'completed', NOW(), NOW());`, [userId]);
     console.log(`Додано користувача з id = ${userId} та його замовлення.`);
 
     // SELECT
