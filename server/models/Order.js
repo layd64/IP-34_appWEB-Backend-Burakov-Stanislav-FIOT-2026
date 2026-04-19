@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db');
 
-// Завдання 7: Створення моделі Order
+// завдання 7: створення моделі order
 const Order = sequelize.define('Order', {
     id: {
         type: DataTypes.INTEGER,
@@ -19,7 +19,7 @@ const Order = sequelize.define('Order', {
     // user_id буде додано автоматично через зв'язок
 }, {
     tableName: 'orders',
-    timestamps: true // Додасть createdAt і updatedAt для замовлень
+    timestamps: true // додасть createdat і updatedat для замовлень
 });
 
 module.exports = Order;
