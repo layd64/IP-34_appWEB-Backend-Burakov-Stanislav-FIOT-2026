@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вхід - BookStore Pro</title>
+    <title>Реєстрація - BookStore Pro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -53,19 +53,48 @@
     <main>
         <section class="auth-section">
             <div class="auth-container">
-                <h2>Вхід</h2>
-                <p class="auth-subtitle">Увійдіть до свого облікового запису</p>
+                <h2>Реєстрація</h2>
+                <p class="auth-subtitle">Створіть обліковий запис для доступу до всіх функцій</p>
 
-                <form id="loginForm" class="auth-form">
+                <form id="registerForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="fullName">Повне ім'я *</label>
+                        <input type="text" id="fullName" name="fullName" required>
+                    </div>
+
                     <div class="form-group">
                         <label for="email">Електронна пошта *</label>
                         <input type="email" id="email" name="email" required>
                     </div>
 
                     <div class="form-group">
+                        <label for="phone">Телефон</label>
+                        <input type="tel" id="phone" name="phone" placeholder="+380XXXXXXXXX">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Адреса</label>
+                        <input type="text" id="address" name="address" placeholder="Місто, вулиця, будинок">
+                    </div>
+
+                    <div class="form-group">
                         <label for="password">Пароль *</label>
                         <div class="password-input-wrapper">
-                            <input type="password" id="password" name="password" required>
+                            <input type="password" id="password" name="password" required minlength="6">
+                            <button type="button" class="password-toggle-btn" aria-label="Показати пароль">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <small>Мінімум 6 символів</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Підтвердження пароля *</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="confirmPassword" name="confirmPassword" required>
                             <button type="button" class="password-toggle-btn" aria-label="Показати пароль">
                                 <svg viewBox="0 0 24 24">
                                     <path
@@ -78,11 +107,15 @@
                     <div id="errorMessage" class="error-message" style="display: none;"></div>
                     <div id="successMessage" class="success-message" style="display: none;"></div>
 
-                    <button type="submit" class="auth-btn">Увійти</button>
+                    <button type="submit" class="auth-btn">Зареєструватися</button>
                 </form>
 
+                <button id="googleLoginBtn" type="button" class="auth-btn google-btn" style="background-color: #fff; color: #4285F4; border: 1px solid #4285F4; margin-top: 15px;">
+                    Увійти через Google
+                </button>
+
                 <p class="auth-footer">
-                    Немає облікового запису? <a href="register.html">Зареєструватися</a>
+                    Вже маєте обліковий запис? <a href="login.html">Увійти</a>
                 </p>
             </div>
         </section>
@@ -114,7 +147,7 @@
     <script src="js/toast.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/script.js"></script>
-    <script src="js/login.js"></script>
+    <script src="js/register.js"></script>
 </body>
 
 </html>

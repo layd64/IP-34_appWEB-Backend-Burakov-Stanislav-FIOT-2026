@@ -1,4 +1,4 @@
-// book details system
+// система деталей книги
 
 class BookDetailsSystem {
     constructor() {
@@ -7,12 +7,12 @@ class BookDetailsSystem {
     }
 
     getAllBooks() {
-        // try to get from global scope
+        // спроба отримати з глобальної області
         if (typeof window !== 'undefined' && window.catalogBooks) {
             return window.catalogBooks;
         }
 
-        // fallback book list
+        // резервний список книг
         return [
             {
                 id: 1,
@@ -262,7 +262,7 @@ class BookDetailsSystem {
     }
 
     getReviews(bookId) {
-        const reviewsJson = localStorage.getItem(this.reviewsKey);
+        const reviewsJson = null;
         const allReviews = reviewsJson ? JSON.parse(reviewsJson) : [];
         return allReviews.filter(review => review.bookId === parseInt(bookId));
     }
@@ -273,10 +273,10 @@ class BookDetailsSystem {
             return { success: false, message: 'Будь ласка, увійдіть до облікового запису, щоб залишити відгук' };
         }
 
-        const reviewsJson = localStorage.getItem(this.reviewsKey);
+        const reviewsJson = null;
         const allReviews = reviewsJson ? JSON.parse(reviewsJson) : [];
 
-        // check if reviewed
+        // перевірка на наявність відгуку
         const existingReview = allReviews.find(
             review => review.bookId === parseInt(bookId) && review.userId === currentUser.id
         );
@@ -296,7 +296,7 @@ class BookDetailsSystem {
         };
 
         allReviews.push(newReview);
-        localStorage.setItem(this.reviewsKey, JSON.stringify(allReviews));
+        // localstorage видалено
 
         return { success: true, message: 'Відгук додано!', review: newReview };
     }
@@ -317,7 +317,7 @@ class BookDetailsSystem {
             return { success: false, message: 'Користувач не автентифікований' };
         }
 
-        const reviewsJson = localStorage.getItem(this.reviewsKey);
+        const reviewsJson = null;
         const allReviews = reviewsJson ? JSON.parse(reviewsJson) : [];
 
         const reviewIndex = allReviews.findIndex(review => review.id === reviewId);
@@ -331,18 +331,18 @@ class BookDetailsSystem {
         }
 
         allReviews.splice(reviewIndex, 1);
-        localStorage.setItem(this.reviewsKey, JSON.stringify(allReviews));
+        // localstorage видалено
 
         return { success: true, message: 'Відгук видалено!' };
     }
 }
 
-// Create global instance (will be initialized after DOM loads)
+// створення глобального об'єкта (буде ініціалізовано після завантаження dom)
 let bookDetailsSystem;
 
-// init book details
+// ініціалізація деталей книги
 document.addEventListener('DOMContentLoaded', function () {
-    // init system
+    // ініціалізація системи
     bookDetailsSystem = new BookDetailsSystem();
     const urlParams = new URLSearchParams(window.location.search);
     const bookId = urlParams.get('id');
@@ -358,12 +358,12 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    // display details
+    // відображення деталей
     const reviews = bookDetailsSystem.getReviews(bookId);
     const averageRating = bookDetailsSystem.calculateAverageRating(bookId);
     const displayRating = averageRating ? parseFloat(averageRating) : book.rating;
 
-    // check favorite
+    // перевірка обраного
     const isFavorite = typeof authSystem !== 'undefined' && authSystem.isFavorite(bookId);
     const heartIcon = '<svg viewBox="0 0 24 24" class="heart-icon"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
     const activeClass = isFavorite ? 'active' : '';
@@ -398,14 +398,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('bookDetails').innerHTML = bookDetailsHTML;
 
-    // favorite button
+    // кнопка обраного
     const favBtn = document.getElementById('bookDetailFavBtn');
     if (favBtn) {
         favBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             e.preventDefault();
 
-            // use global function
+            // використання глобальної функції
             if (typeof window.toggleFavorite === 'function') {
                 const isActive = window.toggleFavorite(bookId);
                 if (isActive) {
@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // add to cart
+    // додати в кошик
     const addToCartBtn = document.getElementById('addToCartBtn');
     if (addToCartBtn && typeof addToCart !== 'undefined') {
         addToCartBtn.addEventListener('click', function () {
@@ -432,20 +432,20 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // display reviews
+    // відображення відгуків
     renderReviews(bookId);
 
-    // display rating
+    // відображення рейтингу
     renderAverageRating(bookId, averageRating, reviews.length);
 
-    // review form
+    // форма відгуку
     const reviewForm = document.getElementById('reviewForm');
     if (reviewForm) {
-        // rating handlers
+        // обробники рейтингу
         const ratingInputs = document.querySelectorAll('input[name="rating"]');
         const ratingLabels = document.querySelectorAll('.rating-input label');
 
-        // get labels
+        // отримання міток
         const labelsArray = Array.from(ratingLabels).reverse();
 
         function updateRatingDisplay(selectedValue) {
@@ -524,7 +524,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 renderReviews(bookId);
                 renderAverageRating(bookId, bookDetailsSystem.calculateAverageRating(bookId), bookDetailsSystem.getReviews(bookId).length);
 
-                // update rating
+                // оновлення рейтингу
                 const newAverageRating = bookDetailsSystem.calculateAverageRating(bookId);
                 const displayRating = newAverageRating ? parseFloat(newAverageRating) : book.rating;
                 const ratingDisplay = document.querySelector('.book-rating-display');
@@ -556,7 +556,7 @@ function renderReviews(bookId) {
         return;
     }
 
-    // sort reviews
+    // сортування відгуків
     reviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     reviewsList.innerHTML = reviews.map(review => {
@@ -578,7 +578,7 @@ function renderReviews(bookId) {
         `;
     }).join('');
 
-    // delete handlers
+    // обробники видалення
     const deleteButtons = document.querySelectorAll('.delete-review-btn');
     deleteButtons.forEach(btn => {
         btn.addEventListener('click', function () {
@@ -594,7 +594,7 @@ function renderReviews(bookId) {
                         const reviews = bookDetailsSystem.getReviews(bookId);
                         renderAverageRating(bookId, bookDetailsSystem.calculateAverageRating(bookId), reviews.length);
 
-                        // update rating
+                        // оновлення рейтингу
                         const book = bookDetailsSystem.getBookById(bookId);
                         const newAverageRating = bookDetailsSystem.calculateAverageRating(bookId);
                         const displayRating = newAverageRating ? parseFloat(newAverageRating) : book.rating;

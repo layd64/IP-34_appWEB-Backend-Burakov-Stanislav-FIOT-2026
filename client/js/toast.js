@@ -1,4 +1,4 @@
-// toast notification system
+// система сповіщень
 
 class ToastNotification {
     constructor() {
@@ -7,18 +7,18 @@ class ToastNotification {
     }
 
     init() {
-        // create container
+        // створення контейнера
         this.container = document.createElement('div');
         this.container.className = 'toast-container';
         document.body.appendChild(this.container);
     }
 
-    // show notification
+    // показати сповіщення
     show(message, type = 'info', duration = 3000) {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
 
-        // status icons
+        // іконки статусу
         const icons = {
             success: '✓',
             error: '✕',
@@ -34,21 +34,21 @@ class ToastNotification {
             <button class="toast-close" aria-label="Close">&times;</button>
         `;
 
-        // add to container
+        // додати до контейнера
         this.container.appendChild(toast);
 
-        // animate entry
+        // анімація появи
         setTimeout(() => {
             toast.classList.add('toast-show');
         }, 10);
 
-        // close button handler
+        // обробник кнопки закриття
         const closeBtn = toast.querySelector('.toast-close');
         closeBtn.addEventListener('click', () => {
             this.hide(toast);
         });
 
-        // auto remove
+        // автоматичне видалення
         if (duration > 0) {
             setTimeout(() => {
                 this.hide(toast);
@@ -58,7 +58,7 @@ class ToastNotification {
         return toast;
     }
 
-    // hide notification
+    // сховати сповіщення
     hide(toast) {
         toast.classList.remove('toast-show');
         toast.classList.add('toast-hide');
@@ -70,7 +70,7 @@ class ToastNotification {
         }, 300);
     }
 
-    // helper methods
+    // допоміжні методи
     success(message, duration = 3000) {
         return this.show(message, 'success', duration);
     }
@@ -87,7 +87,7 @@ class ToastNotification {
         return this.show(message, 'info', duration);
     }
 
-    // confirm dialog
+    // діалог підтвердження
     confirm(message, onConfirm, onCancel) {
         const confirmToast = document.createElement('div');
         confirmToast.className = 'toast-confirm';
@@ -131,7 +131,7 @@ class ToastNotification {
             if (onConfirm) onConfirm();
         });
 
-        // close on escape
+        // закрити по escape
         const handleEscape = (e) => {
             if (e.key === 'Escape') {
                 close();
@@ -145,8 +145,8 @@ class ToastNotification {
     }
 }
 
-// create global instance
+// створення глобального об'єкта
 const toast = new ToastNotification();
 
-// export globally
+// експорт глобально
 window.toast = toast;

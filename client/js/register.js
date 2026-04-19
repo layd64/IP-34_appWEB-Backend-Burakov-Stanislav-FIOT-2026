@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const registerForm = document.getElementById('registerForm');
 
-    registerForm.addEventListener('submit', function (e) {
+    registerForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const password = document.getElementById('password').value;
@@ -27,13 +27,13 @@ document.addEventListener('DOMContentLoaded', function () {
             password: password
         };
 
-        const result = authSystem.register(userData);
+        const result = await authSystem.register(userData);
 
         if (result.success) {
             toast.success(result.message);
             setTimeout(() => {
-                window.location.href = 'profile.html';
-            }, 1500);
+                window.location.href = 'login.html';
+            }, 2500);
         } else {
             toast.error(result.message);
         }
