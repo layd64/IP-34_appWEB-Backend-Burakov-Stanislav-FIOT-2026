@@ -8,6 +8,10 @@ const userRoutes = require('./routes/userRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const { renderTestPage } = require('./controllers/studentController');
 const errorLogger = require('./middlewares/errorLogger');
+const responseTimeLogger = require('./middlewares/responseTimeLogger');
+const uploadRoutes = require('./routes/uploadRoutes');
+const statusRoutes = require('./routes/statusRoutes');
+const morgan = require('morgan');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +20,13 @@ app.use(cors());
 // middleware для парсингу json у тілі запитів
 app.use(express.json());
 app.use(passport.initialize());
+
+
+// логування HTTP-запитів
+app.use(morgan('dev'));
+
+// вимірювання часу відповіді
+app.use(responseTimeLogger);
 
 
 // завдання 2 та інтерфейс для тестування
@@ -29,6 +40,8 @@ app.use('/students', studentRoutes);
 // підключення маршрутів
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/', uploadRoutes);
+app.use('/', statusRoutes);
 
 // middleware логування помилок має бути останнім
 app.use(errorLogger);

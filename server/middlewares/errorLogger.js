@@ -1,20 +1,15 @@
-const fs = require('fs');
-const path = require('path');
+const logger = require('../utils/logger');
 
 function errorLogger(err, req, res, next) {
-    const logMessage = `[${new Date().toISOString()}] ${req.method} ${req.url} - ${err.stack || err.message}\n`;
-    const logDir = path.join(__dirname, '../logs');
-    const logPath = path.join(logDir, 'error.log');
-    
-    if (!fs.existsSync(logDir)) {
-        fs.mkdirSync(logDir, { recursive: true });
-    }
-    
-    fs.appendFile(logPath, logMessage, (fsErr) => {
-        if (fsErr) console.error('Помилка запису в лог-файл:', fsErr);
+    logger.error({
+        message: err.message || 'Внутрішня помилка сервера',
+        stack: err.stack,
+        method: req.method,
+        url: req.url,
+        status: err.status || 500
     });
 
-    res.status(err.status || 500).json({ error: err.message || 'Внутрішня помилка сервера' });
+    res.status(err.status || 500).json({ error: err.message || 'Внутрішня помилка сервера', code: err.status || 500 });
 }
 
 module.exports = errorLogger;
