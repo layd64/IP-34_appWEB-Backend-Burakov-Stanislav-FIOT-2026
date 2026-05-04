@@ -9,4 +9,10 @@ router.get('/status', (req, res) => {
     });
 });
 
+router.get('/error-test', (req, res, next) => {
+    const error = new Error();
+    next(error);
+});
+
+
 module.exports = router;
