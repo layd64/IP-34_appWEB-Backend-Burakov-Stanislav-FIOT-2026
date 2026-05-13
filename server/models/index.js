@@ -1,6 +1,7 @@
 const sequelize = require('../db');
 const User = require('./User');
 const Order = require('./Order');
+const Book = require('./Book');
 
 // завдання 8: реалізація зв'язку one-to-many
 User.hasMany(Order, {
@@ -17,5 +18,6 @@ Order.belongsTo(User, {
 module.exports = {
     sequelize,
     User,
-    Order
+    Order,
+    Book
 };

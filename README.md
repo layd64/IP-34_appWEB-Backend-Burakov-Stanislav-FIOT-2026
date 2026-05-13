@@ -1,52 +1,82 @@
-# BookStore Pro (Fullstack Web-App)
+# BookStore Pro — Fullstack Web App
 
-BookStore Pro - це сучасний веб-застосунок для онлайн-магазину книг, розроблений з використанням клієнт-серверної архітектури. Проєкт імітує цикл роботи інтернет-магазину.
+Сучасний веб-застосунок для онлайн-магазину книг із повноцінним REST API бекендом.
 
-Раніше проєкт працював суто на клієнті, але тепер включає повноцінний бекенд на **Node.js** та **MySQL**.
+## Стек технологій
 
-## Основний функціонал (Бекенд)
+**Бекенд:** Node.js, Express.js, MySQL (Sequelize ORM), Redis, JWT, Docker  
+**Фронтенд:** HTML, CSS, Vanilla JS
 
-- **База Даних**: MySQL за допомогою ORM Sequelize. Моделі `User` та `Order` із зв'язком One-to-Many.
-- **Аутентифікація та Безпека**: 
-  - Реєстрація з підтвердженням пошти (Nodemailer).
-  - Авторизація за допомогою JWT (Access & Refresh токени).
-  - Відновлення пароля через email.
-  - Вхід через Google (OAuth 2.0 за допомогою Passport.js).
-- **Ролі**: Система ролей (Адміністратор та Звичайний користувач). За замовчуванням створюється admin-користувач (`admin@admin.com` / `admin123`).
-- **REST API**: Обробка профілів користувачів, зміна паролів, керування замовленнями, CRUD для студентів.
+## Реалізовані вимоги лабораторної роботи
 
-## Основний функціонал (Фронтенд)
+| Вимога | Реалізація |
+|--------|-----------|
+| REST API (Node.js + Express) | `server/index.js`, `routes/` |
+| Захист — Helmet | `app.use(helmet())` у `index.js` |
+| Захист — Rate Limit | `middlewares/rateLimiter.js` (5 спроб / 15 хв) |
+| Валідація даних | `middlewares/validators.js`, `routes/bookRoutes.js` |
+| Кешування відповідей | Redis у `controllers/bookController.js` |
+| Оптимізація маршруту | `GET /api/books` — Redis cache (TTL 60s) |
+| Тестування API | `server.test.js` (Jest + Supertest, 11 тестів) |
+| Аналіз продуктивності | `benchmark.js` — порівняння БД vs Redis |
+| JWT-автентифікація | `middlewares/authMiddleware.js`, `controllers/authController.js` |
+| Redis-кешування | `docker-compose.yml` (redis:alpine) + `bookController.js` |
+| Swagger документація | `swagger.js`, JSDoc у всіх `routes/*.js` → `/api-docs` |
+| Docker-контейнеризація | `Dockerfile` + `docker-compose.yml` (app + MySQL + Redis) |
+| Навантажувальне тестування | Artillery: `npm run loadtest` |
 
-- **Каталог книг**: Пошук, фільтрація (за ціною, жанром, рейтингом) та сортування (статичний UI).
-- **Кошик та Обране**: Додавання книг.
-- **Адаптивність**: Повна підтримка мобільних пристроїв та планшетів.
+## Швидкий запуск (Docker)
 
-## Як запустити проєкт
+```bash
+cd server
+docker-compose up --build
+```
 
-### 1. Налаштування бази даних
-1. Встановіть MySQL Server.
-2. Створіть базу даних `web_backend_lab` (або просто запустіть `node mysql2-demo.js` для автоматичного створення).
-3. Переконайтеся, що облікові дані MySQL вказані вірно (`root` / пароль).
+Сервер: http://localhost:3000  
+Swagger UI: http://localhost:3000/api-docs
 
-### 2. Запуск бекенду
-1. Перейдіть до папки `server`:
-   ```bash
-   cd server
-   ```
-2. Встановіть залежності:
-   ```bash
-   npm install
-   ```
-3. Створіть файл `.env` із вашими налаштуваннями (пошта для відправки листів, JWT secrets, Google OAuth keys).
-4. Запустіть сервер:
-   ```bash
-   npm start
-   ```
-Сервер запуститься на http://localhost:3000. *Примітка: база даних синхронізується автоматично при запуску сервера (дані будуть скинуті до початкових, додається лише адмін).*
+Дефолтний адмін: `admin@admin.com` / `admin123`
 
-### 3. Запуск фронтенду
-1. Перейдіть до папки `client`.
-2. Відкрийте файл `index.html` у браузері або використайте розширення **Live Server** у VS Code.
+## Запуск без Docker
+
+```bash
+cd server
+npm install
+# Потрібен запущений MySQL на порту 3306 і Redis на порту 6379
+npm start
+```
+
+## Тестування
+
+```bash
+# Юніт-тести (Jest + Supertest) — сервер має бути запущений
+npm test
+
+# Навантажувальне тестування (Artillery)
+npm run loadtest
+
+# Benchmark до/після оптимізації
+node benchmark.js
+```
+
+## Структура проєкту
+
+```
+server/
+├── controllers/     # Бізнес-логіка
+├── middlewares/     # Helmet, JWT, Rate-limit, Validators, Logger
+├── models/          # Sequelize моделі (User, Order, Book)
+├── routes/          # Express маршрути зі Swagger JSDoc
+├── services/        # Поштовий сервіс
+├── utils/           # Winston logger
+├── swagger.js       # Swagger конфігурація
+├── docker-compose.yml
+├── Dockerfile
+└── server.test.js   # Jest тести
+
+client/              # Фронтенд (HTML/CSS/JS)
+```
 
 ## Автор
-Розроблено студентом групи ІП-34, Бураков Станіслав.
+Бураков Станіслав, група ІП-34
+
