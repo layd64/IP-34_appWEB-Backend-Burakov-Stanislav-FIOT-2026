@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { getProfile, updateProfile, changePassword, deleteAccount, getAllUsers, deleteUserByAdmin, createUser, createOrder } = require('../controllers/userController');
+const { getProfile, updateProfile, changePassword, deleteAccount, getAllUsers, deleteUserByAdmin, createUser, createOrder, toggleFavorite, getFavorites, getAllOrders } = require('../controllers/userController');
 const authenticateToken = require('../middlewares/authMiddleware');
 const authorizeRole = require('../middlewares/roleMiddleware');
 const { validatePasswordChange } = require('../middlewares/validators');
@@ -223,6 +223,56 @@ router.post('/', createUser);
  *         description: Користувача не знайдено
  */
 router.post('/:userId/orders', createOrder);
+
+/**
+ * @swagger
+ * /api/users/favorites/{bookId}:
+ *   post:
+ *     summary: Додати або видалити книгу з улюблених
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: bookId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Статус улюбленої книги змінено
+ *       404:
+ *         description: Книгу не знайдено
+ */
+router.post('/favorites/:bookId', authenticateToken, toggleFavorite);
+
+/**
+ * @swagger
+ * /api/users/favorites:
+ *   get:
+ *     summary: Отримати список улюблених книг поточного користувача
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Список улюблених книг
+ */
+router.get('/favorites', authenticateToken, getFavorites);
+
+/**
+ * @swagger
+ * /api/users/orders/all:
+ *   get:
+ *     summary: Отримати всі замовлення (для адміна)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Список всіх замовлень
+ */
+router.get('/orders/all', authenticateToken, getAllOrders);
 
 module.exports = router;
 

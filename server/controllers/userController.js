@@ -108,4 +108,56 @@ const createOrder = async (req, res, next) => {
     }
 };
 
-module.exports = { getProfile, updateProfile, changePassword, deleteAccount, getAllUsers, deleteUserByAdmin, createUser, createOrder };
+const toggleFavorite = async (req, res, next) => {
+    try {
+        const { bookId } = req.params;
+        const user = await User.findByPk(req.user.id);
+        if (!user) return res.status(404).json({ error: 'Користувача не знайдено' });
+
+        const book = await require('../models/Book').findByPk(bookId);
+        if (!book) return res.status(404).json({ error: 'Книгу не знайдено' });
+
+        const hasFavorite = await user.hasFavorite(book);
+        if (hasFavorite) {
+            await user.removeFavorite(book);
+            return res.json({ message: 'Книгу видалено з улюблених', isFavorite: false });
+        } else {
+            await user.addFavorite(book);
+            return res.json({ message: 'Книгу додано до улюблених', isFavorite: true, book });
+        }
+    } catch (err) {
+        next(err);
+    }
+};
+
+const getFavorites = async (req, res, next) => {
+    try {
+        const user = await User.findByPk(req.user.id, {
+            include: [{
+                model: require('../models/Book'),
+                as: 'favorites',
+                through: { attributes: [] }
+            }]
+        });
+        
+        if (!user) return res.status(404).json({ error: 'Користувача не знайдено' });
+        
+        res.json({ favorites: user.favorites });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const getAllOrders = async (req, res, next) => {
+    try {
+        const orders = await Order.findAll({
+            include: [{ model: User, as: 'user', attributes: ['id', 'username', 'email'] }],
+            order: [['createdAt', 'DESC']]
+        });
+        res.json(orders);
+    } catch (err) {
+        next(err);
+    }
+};
+
+module.exports = { getProfile, updateProfile, changePassword, deleteAccount, getAllUsers, deleteUserByAdmin, createUser, createOrder, toggleFavorite, getFavorites, getAllOrders };

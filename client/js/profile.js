@@ -119,8 +119,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // відображення улюблених
     async function renderFavorites() {
-        // заглушка масиву улюблених
-        const favorites = [];
+        const favorites = authSystem.getFavorites();
         const favoritesGrid = document.getElementById('favoritesGrid');
 
         if (!favoritesGrid) return;
@@ -132,74 +131,70 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         favoritesGrid.innerHTML = '';
 
-        if (!window.catalogBooks) {
-            favoritesGrid.innerHTML = '<p class="error-message">Не вдалося завантажити список книг.</p>';
-            return;
-        }
+        favorites.forEach(book => {
+            const bookCard = document.createElement('div');
+            bookCard.classList.add('book-card');
+            bookCard.setAttribute('data-description', book.description || '');
 
-        favorites.forEach(bookId => {
-            const book = window.catalogBooks.find(b => b.id === parseInt(bookId));
-            if (book) {
-                const bookCard = document.createElement('div');
-                bookCard.classList.add('book-card');
-                bookCard.setAttribute('data-description', book.description); // забезпечення збігу атрибутів
+            const ratingValue = parseFloat(book.rating) || 0;
+            const heartIcon = '<svg viewBox="0 0 24 24" class="heart-icon"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
 
-                // логіка точного збігу
-                const { ratingValue } = getBookRatingInfo(book.id, book.rating);
-                const heartIcon = '<svg viewBox="0 0 24 24" class="heart-icon"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
+            // активний стан
+            const activeClass = 'active';
+            const imgSrc = book.image && !book.image.startsWith('assets/slideshow') 
+                   ? book.image 
+                   : 'assets/book-placeholder.png';
 
-                // активний стан
-                const activeClass = 'active';
+            const stars = '★'.repeat(Math.round(ratingValue)) + '☆'.repeat(5 - Math.round(ratingValue));
 
-                bookCard.innerHTML = `
-                    <a href="book.html?id=${book.id}" class="book-card-link">
-                        <img src="${book.image}" alt="${book.title}" class="book-image">
-                        <h3>${book.title}</h3>
-                        <p class="book-author">${book.author}</p>
-                        <p class="book-price">${book.price} грн</p>
-                        <div class="book-rating-card">
-                            <span class="book-rating-stars">${buildRatingStars(ratingValue)}</span>
-                            <span class="book-rating-value">${ratingValue.toFixed(1)}</span>
-                        </div>
-                    </a>
-                    <div class="card-actions">
-                         <button class="add-to-cart-btn" data-book-id="${book.id}">В КОШИК</button>
-                         <button class="favorite-btn ${activeClass}" data-book-id="${book.id}" aria-label="Remove from favorites">
-                            ${heartIcon}
-                        </button>
+            bookCard.innerHTML = `
+                <a href="book.html?id=${book.id}" class="book-card-link">
+                    <img src="${imgSrc}" alt="${book.title}" class="book-image" onerror="this.src='assets/book-placeholder.png'">
+                    <h3>${book.title}</h3>
+                    <p class="book-author">${book.author}</p>
+                    <p class="book-price">${book.price} грн</p>
+                    <div class="book-rating-card">
+                        <span class="book-rating-stars" style="color:#f59e0b">${stars}</span>
+                        <span class="book-rating-value">${ratingValue.toFixed(1)}</span>
                     </div>
-                `;
+                </a>
+                <div class="card-actions">
+                     <button class="add-to-cart-btn" data-book-id="${book.id}">В КОШИК</button>
+                     <button class="favorite-btn ${activeClass}" data-book-id="${book.id}" aria-label="Remove from favorites">
+                        ${heartIcon}
+                    </button>
+                </div>
+            `;
 
-                const favBtn = bookCard.querySelector('.favorite-btn');
-                favBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    // використання глобальної функції
-                    window.toggleFavorite(book.id);
-                    // перемалювання
+            const favBtn = bookCard.querySelector('.favorite-btn');
+            favBtn.addEventListener('click', async function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof window.toggleFavorite === 'function') {
+                    await window.toggleFavorite(book.id);
+                    // Оновлення списку улюблених після видалення
                     renderFavorites();
-                });
+                }
+            });
 
-                const cartBtn = bookCard.querySelector('.add-to-cart-btn');
-                cartBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
+            const cartBtn = bookCard.querySelector('.add-to-cart-btn');
+            cartBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
 
-                    if (typeof window.addToCart === 'function') {
-                        window.addToCart({
-                            id: book.id, // забезпечення передачі id
-                            title: book.title,
-                            price: `${book.price} грн`,
-                            image: book.image
-                        });
-                    } else {
-                        console.error('addToCart function not found');
-                        toast.error('Помилка додавання до кошика');
-                    }
-                });
+                if (typeof window.addToCart === 'function') {
+                    window.addToCart({
+                        id: book.id,
+                        title: book.title,
+                        price: parseFloat(book.price),
+                        image: book.image
+                    });
+                } else {
+                    toast.error('Помилка додавання до кошика');
+                }
+            });
 
-                favoritesGrid.appendChild(bookCard);
-            }
+            favoritesGrid.appendChild(bookCard);
         });
     }
 

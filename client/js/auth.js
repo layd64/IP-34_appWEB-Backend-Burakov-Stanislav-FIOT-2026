@@ -2,7 +2,7 @@
 
 class AuthSystem {
     constructor() {
-        this.apiBase = 'http://localhost:3000/api';
+        this.apiBase = '/api';
         this.currentUser = null;
         this.isInitialized = false;
         this.initPromise = this.initProfile();
@@ -23,6 +23,17 @@ class AuthSystem {
             } else {
                 const data = await res.json();
                 this.currentUser = { id: data.id, email: data.email, fullName: data.username, phone: data.phone, address: data.address, role: data.role, favorites: [] };
+                
+                // Fetch favorites
+                try {
+                    const favRes = await fetch(`${this.apiBase}/users/favorites`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (favRes.ok) {
+                        const favData = await favRes.json();
+                        this.currentUser.favorites = favData.favorites || [];
+                    }
+                } catch(e) {}
             }
         } catch (e) {}
         this.isInitialized = true;
@@ -155,17 +166,44 @@ class AuthSystem {
         }
     }
 
-    // заглушка логіки улюблених, оскільки бекенд цього не вимагає
-    toggleFavorite(bookId) {
-        return { success: false, message: 'Функція збережена у розробці...' };
+    async toggleFavorite(bookId) {
+        if (!this.isAuthenticated() || !this.currentUser) {
+            return { success: false, message: 'Будь ласка, увійдіть до облікового запису' };
+        }
+        
+        try {
+            const res = await fetch(`${this.apiBase}/users/favorites/${bookId}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${this.getToken()}` }
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                // Оновити локальний кеш
+                if (data.isFavorite) {
+                    // додаємо локально (потрібні дані про книгу для getFavorites, але поки тільки id зберігаємо)
+                    if (!this.currentUser.favorites.some(f => f.id == bookId)) {
+                        this.currentUser.favorites.push(data.book || { id: parseInt(bookId) });
+                    }
+                } else {
+                    this.currentUser.favorites = this.currentUser.favorites.filter(f => f.id != bookId);
+                }
+                return { success: true, message: data.message, isFavorite: data.isFavorite };
+            } else {
+                return { success: false, message: data.error || 'Помилка' };
+            }
+        } catch (e) {
+            return { success: false, message: 'Помилка з\'єднання' };
+        }
     }
 
     getFavorites() {
-        return [];
+        return this.currentUser ? this.currentUser.favorites : [];
     }
 
     isFavorite(bookId) {
-        return false;
+        if (!this.currentUser || !this.currentUser.favorites) return false;
+        return this.currentUser.favorites.some(fav => fav.id == bookId);
     }
 }
 

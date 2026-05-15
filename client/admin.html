@@ -9,85 +9,260 @@
     <link href="https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
-    <style>
-        .admin-container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .users-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .users-table th, .users-table td {
-            text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-        }
-        .users-table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-        }
-        .delete-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .delete-btn:hover {
-            background-color: #c82333;
-        }
-    </style>
+    <link rel="stylesheet" href="css/admin.css">
 </head>
-<body>
-    <header>
-        <nav>
-            <div class="logo">
-                <a href="index.html"><h1>BookStore Pro</h1></a>
-            </div>
-            <ul class="nav-links">
-                <li><a href="index.html">Головна</a></li>
-                <li><a href="catalog.html#catalog-title">Каталог</a></li>
-                <li><a href="profile.html" id="loginLink">Профіль</a></li>
-            </ul>
-        </nav>
-    </header>
+<body class="admin-body">
+    <!-- Mobile Sidebar Overlay -->
+    <div class="admin-sidebar-overlay" id="adminSidebarOverlay"></div>
 
-    <main>
-        <section class="admin-container">
-            <h2>Управління користувачами</h2>
-            <div id="adminContent">
-                <table class="users-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Ім'я</th>
-                            <th>Email</th>
-                            <th>Роль</th>
-                            <th>Дата реєстрації</th>
-                            <th>Дії</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersTableBody">
-                        <!-- користувачів буде додано тут -->
-                    </tbody>
-                </table>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-logo">
+            <a href="index.html">
+                <span class="logo-text">BookStore Pro</span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <button class="sidebar-item active" data-tab="books" id="sidebarTabBooks">
+                <span>Книги</span>
+            </button>
+            <button class="sidebar-item" data-tab="users" id="sidebarTabUsers">
+                <span>Користувачі</span>
+            </button>
+            <button class="sidebar-item" data-tab="orders" id="sidebarTabOrders">
+                <span>Замовлення</span>
+            </button>
+            <button class="sidebar-item" data-tab="newsletter" id="sidebarTabNewsletter">
+                <span>Розсилка</span>
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="index.html" class="sidebar-back-btn">← На сайт</a>
+        </div>
+    </aside>
+
+    <!-- Доступ заборонено (поза .admin-main — відображається навіть коли main прихований) -->
+    <div id="accessDenied" class="access-denied" style="display:none;">
+        <div class="access-denied-content">
+            <span class="access-denied-icon">🔒</span>
+            <h2>Доступ заборонено</h2>
+            <p>Ця сторінка доступна лише адміністраторам.</p>
+            <a href="index.html" class="btn-primary">На головну</a>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <button class="sidebar-toggle" id="sidebarToggleBtn" aria-label="Toggle sidebar">
+                <span></span><span></span><span></span>
+            </button>
+            <h1 class="admin-title" id="pageTitle">Управління книгами</h1>
+            <div class="topbar-user" id="topbarUser">Адміністратор</div>
+        </header>
+
+        <!-- BOOKS TAB -->
+        <section class="admin-tab" id="tab-books">
+            <div class="tab-toolbar">
+                <div class="toolbar-search">
+                    <input type="text" id="booksSearch" placeholder="Пошук книг...">
+                </div>
+                <button class="btn-primary" id="addBookBtn">
+                    <span>+</span> Додати книгу
+                </button>
             </div>
-            <div id="accessDenied" style="display: none; color: red;">
-                <h3>Доступ заборонено. Тільки для адміністраторів.</h3>
+
+            <div class="admin-card">
+                <div class="table-responsive">
+                    <table class="admin-table" id="booksTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Обкладинка</th>
+                                <th>Назва</th>
+                                <th>Автор</th>
+                                <th>Жанр</th>
+                                <th>Ціна</th>
+                                <th>Рейтинг</th>
+                                <th>В наявності</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody id="booksTableBody">
+                            <tr><td colspan="9" class="table-loading">Завантаження...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="booksPagination" class="table-pagination"></div>
             </div>
         </section>
-    </main>
+
+        <!-- USERS TAB -->
+        <section class="admin-tab" id="tab-users" style="display:none;">
+            <div class="tab-toolbar">
+                <div class="toolbar-search">
+                    <input type="text" id="usersSearch" placeholder="Пошук користувачів...">
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Ім'я</th>
+                                <th>Email</th>
+                                <th>Роль</th>
+                                <th>Підтверджено</th>
+                                <th>Дата реєстрації</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr><td colspan="7" class="table-loading">Завантаження...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ORDERS TAB -->
+        <section class="admin-tab" id="tab-orders" style="display:none;">
+            <div class="tab-toolbar">
+                <div class="toolbar-search">
+                    <input type="text" id="ordersSearch" placeholder="Пошук по імені або email...">
+                </div>
+                <div class="toolbar-stats" id="ordersStats"></div>
+            </div>
+
+            <div class="admin-card">
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Користувач</th>
+                                <th>Email</th>
+                                <th>Сума</th>
+                                <th>Статус</th>
+                                <th>Дата</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <tr><td colspan="6" class="table-loading">Завантаження...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секція Розсилки -->
+        <section class="admin-tab" id="tab-newsletter" style="display:none;">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>Надіслати листа підписникам</h2>
+                    <p class="card-subtitle">Цей лист отримають усі користувачі, які підписалися на розсилку на головній сторінці.</p>
+                </div>
+                <div class="card-body">
+                    <form id="newsletterSendForm" class="admin-form newsletter-compose-form">
+                        <div class="form-group">
+                            <label for="newsletterSubject">Тема листа *</label>
+                            <input type="text" id="newsletterSubject" placeholder="Введіть тему листа..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newsletterMessage">Повідомлення (HTML підтримується) *</label>
+                            <textarea id="newsletterMessage" placeholder="<p>Текст вашого листа...</p>" rows="12" required></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary" id="newsletterSendBtn">
+                                <span>✉️</span> Надіслати розсилку зараз
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal: Додати / Редагувати книгу -->
+    <div id="bookModal" class="admin-modal" style="display:none;">
+        <div class="admin-modal-backdrop" id="bookModalBackdrop"></div>
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                <h2 id="bookModalTitle">Додати книгу</h2>
+                <button class="admin-modal-close" id="bookModalCloseBtn">&times;</button>
+            </div>
+            <form id="bookForm" class="admin-form">
+                <input type="hidden" id="bookId">
+                <div class="form-grid">
+                    <div class="form-group form-col-2">
+                        <label for="bookTitle">Назва книги *</label>
+                        <input type="text" id="bookTitle" placeholder="Введіть назву..." required minlength="2">
+                    </div>
+                    <div class="form-group form-col-2">
+                        <label for="bookAuthor">Автор *</label>
+                        <input type="text" id="bookAuthor" placeholder="Ім'я автора..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookGenre">Жанр *</label>
+                        <input type="text" id="bookGenre" placeholder="Наприклад: Фентезі" required list="genresList">
+                        <datalist id="genresList"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookPrice">Ціна (грн) *</label>
+                        <input type="number" id="bookPrice" placeholder="0" required min="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="bookRating">Рейтинг (1-5)</label>
+                        <input type="number" id="bookRating" placeholder="5" min="1" max="5" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="bookStock">Кількість в наявності</label>
+                        <input type="number" id="bookStock" placeholder="0" min="0" step="1">
+                    </div>
+                    <div class="form-group form-col-2" id="coverUploadGroup">
+                        <label>Обкладинка книги</label>
+                        <!-- Hidden actual URL stored here -->
+                        <input type="hidden" id="bookImage">
+                        <!-- Drop zone -->
+                        <div class="cover-upload-zone" id="coverDropZone">
+                            <div class="cover-preview-wrap" id="coverPreviewWrap" style="display:none;">
+                                <img id="coverPreviewImg" src="" alt="Обкладинка" class="cover-preview-img">
+                                <button type="button" class="cover-remove-btn" id="coverRemoveBtn" title="Видалити обкладинку">✕</button>
+                            </div>
+                            <div class="cover-upload-placeholder" id="coverUploadPlaceholder">
+                                <span class="cover-upload-icon">🖼️</span>
+                                <p class="cover-upload-hint">Перетягніть зображення сюди<br>або <span class="cover-upload-link">оберіть файл</span></p>
+                                <p class="cover-upload-sub">JPG, PNG, WebP — до 5 МБ</p>
+                                <input type="file" id="coverFileInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none;">
+                            </div>
+                            <div class="cover-upload-progress" id="coverUploadProgress" style="display:none;">
+                                <div class="cover-progress-bar" id="coverProgressBar"></div>
+                                <span class="cover-progress-text" id="coverProgressText">Завантаження...</span>
+                            </div>
+                        </div>
+                        <!-- Fallback: manual URL -->
+                        <div class="cover-url-fallback">
+                            <span class="cover-url-label">або вкажіть посилання:</span>
+                            <input type="text" id="bookImageUrl" placeholder="https://... або assets/book.png" class="cover-url-input">
+                        </div>
+                    </div>
+                    <div class="form-group form-col-2">
+                        <label for="bookDescription">Опис книги</label>
+                        <textarea id="bookDescription" placeholder="Короткий опис..." rows="4"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="bookCancelBtn">Скасувати</button>
+                    <button type="submit" class="btn-primary" id="bookSubmitBtn">Зберегти</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="js/toast.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/script.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>

@@ -271,7 +271,7 @@ function buildRatingStars(ratingValue) {
 }
 
 // ініціалізація додатку
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
     // мобільне меню
     initMobileMenu();
 
@@ -288,11 +288,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const path = window.location.pathname;
 
     if (path.endsWith('index.html') || path === '/' || path.endsWith('/')) {
+        try {
+            const res = await fetch('/api/books?limit=500');
+            if (!res.ok) throw new Error('Помилка сервера');
+            const data = await res.json();
+            if (data && data.data && data.data.books) {
+                window.catalogBooks = data.data.books;
+            }
+        } catch (error) {
+            console.error('Не вдалося завантажити книги з сервера:', error);
+            if (typeof toast !== 'undefined') {
+                toast.error('Сервер тимчасово недоступний. Дані можуть бути неповними або застарілими.');
+            }
+        }
         renderHomePageCategories();
         initHomePage();
-    } else if (path.endsWith('catalog.html')) {
-        initCatalog();
     }
+    // catalog.html обробляється в catalog.js
 
     // перемикач пароля
     initPasswordToggles();
@@ -451,7 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const height = 600;
             const left = (window.screen.width / 2) - (width / 2);
             const top = (window.screen.height / 2) - (height / 2);
-            window.open('http://localhost:3000/api/auth/google', 'Google Auth', `width=${width},height=${height},top=${top},left=${left}`);
+            window.open('/api/auth/google', 'Google Auth', `width=${width},height=${height},top=${top},left=${left}`);
         });
     }
 });
@@ -470,251 +482,7 @@ function renderHomePageCategories() {
     `).join('');
 }
 
-// ініціалізація сторінки каталогу
-function initCatalog() {
-    const catalogGrid = document.getElementById('catalogGrid');
-    const genreFilter = document.getElementById('genreFilter');
-    const ratingFilter = document.getElementById('ratingFilter');
-    const priceFilter = document.getElementById('priceFilter');
-    const sortBy = document.getElementById('sortBy');
-    const searchInput = document.getElementById('searchInput');
-    const resetBtn = document.getElementById('resetFilters');
-    const noResults = document.getElementById('noResults');
-    const paginationContainer = document.getElementById('catalogPagination');
-
-    if (!catalogGrid) return;
-
-    const BOOKS_PER_PAGE = 15;
-    let currentPage = 1;
-    let filteredBooks = [];
-
-    // заповнення фільтру жанрів
-    const genres = [...new Set(window.catalogBooks.map(book => book.genre))].sort();
-    genres.forEach(genre => {
-        const option = document.createElement('option');
-        option.value = genre;
-        option.textContent = genre;
-        genreFilter.appendChild(option);
-    });
-
-    // застосування url фільтрів
-    const urlParams = new URLSearchParams(window.location.search);
-    const categoryParam = urlParams.get('category');
-    if (categoryParam && genres.includes(categoryParam)) {
-        genreFilter.value = categoryParam;
-    }
-
-    // функція відображення
-    function renderBooks() {
-        currentPage = 1; // скидання сторінки
-
-        // збір фільтрів
-        const genreValue = genreFilter.value;
-        const ratingValue = parseInt(ratingFilter.value) || 0;
-        const priceValue = priceFilter.value;
-        const sortValue = sortBy.value;
-        const searchValue = searchInput.value.toLowerCase().trim();
-
-        // збагачення рейтингами
-        const booksWithRatings = window.catalogBooks.map(book => {
-            const { ratingValue: liveRating, reviewCount } = getBookRatingInfo(book.id, book.rating);
-            return { ...book, ratingValue: liveRating, reviewCount };
-        });
-
-        // фільтрація книг
-        filteredBooks = booksWithRatings.filter(book => {
-            // жанр
-            if (genreValue && book.genre !== genreValue) return false;
-
-            // рейтинг
-            if (book.ratingValue < ratingValue) return false;
-
-            // ціна
-            if (priceValue) {
-                const [min, max] = priceValue.split('-').map(v => v === '+' ? Infinity : parseInt(v));
-                if (priceValue.includes('+')) {
-                    if (book.price < 600) return false;
-                } else {
-                    if (book.price < min || book.price > max) return false;
-                }
-            }
-
-            // пошук
-            if (searchValue) {
-                const searchMatch = book.title.toLowerCase().includes(searchValue) ||
-                    book.author.toLowerCase().includes(searchValue);
-                if (!searchMatch) return false;
-            }
-
-            return true;
-        });
-
-        // сортування книг
-        if (sortValue === 'rating-desc') {
-            filteredBooks.sort((a, b) => b.ratingValue - a.ratingValue);
-        } else if (sortValue === 'rating-asc') {
-            filteredBooks.sort((a, b) => a.ratingValue - b.ratingValue);
-        }
-
-        renderCurrentPage();
-        renderPagination();
-    }
-
-    function renderCurrentPage() {
-        // відображення сітки
-        if (filteredBooks.length === 0) {
-            catalogGrid.innerHTML = '';
-            noResults.style.display = 'block';
-            paginationContainer.innerHTML = '';
-            return;
-        }
-
-        noResults.style.display = 'none';
-
-        // обчислення пагінації
-        const startIndex = (currentPage - 1) * BOOKS_PER_PAGE;
-        const endIndex = startIndex + BOOKS_PER_PAGE;
-        const booksToShow = filteredBooks.slice(startIndex, endIndex);
-
-        catalogGrid.innerHTML = booksToShow.map(book => `
-            <div class="book-card" data-book-id="${book.id}">
-                <a href="book.html?id=${book.id}" class="book-card-link">
-                    <img src="${book.image}" alt="${book.title}" class="book-image">
-                    <div class="book-info">
-                        <h3>${book.title}</h3>
-                        <p class="book-author">${book.author}</p>
-                        <p class="book-genre-small">${book.genre}</p>
-                        <div class="book-rating-card">
-                            <span class="book-rating-stars">${buildRatingStars(book.ratingValue)}</span>
-                            <span class="book-rating-value">${book.ratingValue.toFixed(1)}</span>
-                        </div>
-                        <p class="book-price">${book.price} грн</p>
-                    </div>
-                </a>
-                <div class="card-actions">
-                     <button class="add-to-cart-btn" onclick="addToCart({
-                        id: ${book.id},
-                        title: '${book.title.replace(/'/g, "\\'")}',
-                        price: '${book.price} грн',
-                        image: '${book.image}'
-                     })">В КОШИК</button>
-                     <button class="favorite-btn ${isFavorite(book.id) ? 'active' : ''}" 
-                             onclick="const btn = this; const isAdded = toggleFavorite(${book.id}); isAdded ? btn.classList.add('active') : btn.classList.remove('active');" 
-                             aria-label="Toggle favorite">
-                        <svg viewBox="0 0 24 24" class="heart-icon">
-                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        `).join('');
-
-        // прокрутка вгору
-        catalogGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    function renderPagination() {
-        if (filteredBooks.length === 0) {
-            paginationContainer.innerHTML = '';
-            return;
-        }
-
-        const totalPages = Math.ceil(filteredBooks.length / BOOKS_PER_PAGE);
-
-        if (totalPages <= 1) {
-            paginationContainer.innerHTML = '';
-            return;
-        }
-
-        let paginationHTML = '<div class="pagination-controls">';
-
-        // кнопка назад
-        paginationHTML += `
-            <button class="pagination-btn" ${currentPage === 1 ? 'disabled' : ''} 
-                    onclick="goToPage(${currentPage - 1})">
-                ← Попередня
-            </button>
-        `;
-
-        // номери сторінок
-        const maxVisiblePages = 5;
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-        // коригування початкової сторінки
-        if (endPage - startPage < maxVisiblePages - 1) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
-
-        // перша сторінка
-        if (startPage > 1) {
-            paginationHTML += `<button class="pagination-btn" onclick="goToPage(1)">1</button>`;
-            if (startPage > 2) {
-                paginationHTML += `<span class="pagination-ellipsis">...</span>`;
-            }
-        }
-
-        // номери сторінок
-        for (let i = startPage; i <= endPage; i++) {
-            paginationHTML += `
-                <button class="pagination-btn ${i === currentPage ? 'active' : ''}" 
-                        onclick="goToPage(${i})">
-                    ${i}
-                </button>
-            `;
-        }
-
-        // остання сторінка
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                paginationHTML += `<span class="pagination-ellipsis">...</span>`;
-            }
-            paginationHTML += `<button class="pagination-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
-        }
-
-        // кнопка вперед
-        paginationHTML += `
-            <button class="pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} 
-                    onclick="goToPage(${currentPage + 1})">
-                Наступна →
-            </button>
-        `;
-
-        paginationHTML += '</div>';
-        paginationContainer.innerHTML = paginationHTML;
-    }
-
-    // глобальна навігація
-    window.goToPage = function (page) {
-        currentPage = page;
-        renderCurrentPage();
-        renderPagination();
-    };
-
-    // слухачі подій
-    genreFilter.addEventListener('change', renderBooks);
-    ratingFilter.addEventListener('change', renderBooks);
-    priceFilter.addEventListener('change', renderBooks);
-    sortBy.addEventListener('change', renderBooks);
-    searchInput.addEventListener('input', renderBooks);
-
-    resetBtn.addEventListener('click', function () {
-        genreFilter.value = '';
-        ratingFilter.value = '0';
-        priceFilter.value = '';
-        sortBy.value = 'none';
-        searchInput.value = '';
-
-        // оновлення url
-        const newUrl = window.location.pathname;
-        window.history.pushState({ path: newUrl }, '', newUrl);
-
-        renderBooks();
-    });
-
-    // початкове відображення
-    renderBooks();
-}
+// initCatalog переміщено/замінено функціоналом з catalog.js
 
 // налаштування кошика
 function initCart() {
@@ -726,7 +494,10 @@ function initCart() {
     const mobileCountSpan = document.getElementById('mobileCartCount');
 
     // завантаження кошика
-    let cart = [];
+    let cart = (JSON.parse(localStorage.getItem('bookstore_cart')) || []).map(item => ({
+        ...item,
+        price: typeof item.price === 'string' ? parseFloat(item.price.replace(/[^\d.]/g, '')) || 0 : item.price
+    }));
     updateCartCount();
 
     // відкрити модальне вікно
@@ -753,7 +524,7 @@ function initCart() {
     // логіка оформлення
     const checkoutBtn = document.querySelector('.checkout-btn');
     if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', function () {
+        checkoutBtn.addEventListener('click', async function () {
             if (typeof authSystem === 'undefined' || !authSystem.isAuthenticated()) {
                 toast.error('Будь ласка, увійдіть до облікового запису, щоб оформити замовлення');
                 return;
@@ -764,19 +535,49 @@ function initCart() {
                 return;
             }
 
-            // очищення кошика
-            cart = [];
-            // localstorage видалено
-            updateCartCount();
-            renderCartItems();
+            try {
+                // Обчислення загальної суми
+                const totalAmount = cart.reduce((sum, item) => {
+                    const price = parseFloat(String(item.price).replace(/[^\d.]/g, ''));
+                    return sum + (isNaN(price) ? 0 : price);
+                }, 0);
 
-            // закрити модальне вікно
-            if (cartModal) {
-                cartModal.style.display = 'none';
+                const user = authSystem.getCurrentUser();
+                
+                // Надсилання замовлення на сервер
+                const res = await fetch(`/api/users/${user.id}/orders`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authSystem.getToken()}`
+                    },
+                    body: JSON.stringify({
+                        total_amount: totalAmount,
+                        status: 'pending'
+                    })
+                });
+
+                if (!res.ok) {
+                    throw new Error('Не вдалося створити замовлення');
+                }
+
+                // очищення кошика
+                cart = [];
+                localStorage.setItem('bookstore_cart', JSON.stringify(cart));
+                updateCartCount();
+                renderCartItems();
+
+                // закрити модальне вікно
+                if (cartModal) {
+                    cartModal.style.display = 'none';
+                }
+
+                // показати успіх
+                toast.success('Замовлення успішно оформлено! Дякуємо за покупку.');
+            } catch (err) {
+                console.error(err);
+                toast.error('Помилка при оформленні замовлення. Спробуйте пізніше.');
             }
-
-            // показати успіх
-            toast.success('Замовлення успішно оформлено! Дякуємо за покупку.');
         });
     }
 
@@ -788,7 +589,7 @@ function initCart() {
         }
 
         cart.push(book);
-        // localstorage видалено
+        localStorage.setItem('bookstore_cart', JSON.stringify(cart));
         updateCartCount();
         toast.success('Книгу додано до кошика!');
     };
@@ -811,29 +612,36 @@ function initCart() {
 
         let total = 0;
         container.innerHTML = cart.map((item, index) => {
-            const price = parseInt(item.price.replace(/\D/g, ''));
-            total += price;
+            const price = parseFloat(String(item.price).replace(/[^\d.]/g, ''));
+            total += (isNaN(price) ? 0 : price);
+            const displayPrice = isNaN(price) ? item.price : `${price.toFixed(2)} грн`;
             return `
                 <div class="cart-item">
-                    <img src="${item.image}" alt="${item.title}" class="cart-item-image">
+                    <img src="${item.image || 'assets/book2.png'}" alt="${item.title}" class="cart-item-image" onerror="this.src='assets/book2.png'">
                     <div class="cart-item-info">
                         <h4>${item.title}</h4>
-                        <p>${item.price}</p>
+                        <p>${displayPrice}</p>
                     </div>
-                    <button class="cart-item-remove" onclick="removeFromCart(${index})" aria-label="Видалити">&times;</button>
+                    <button class="cart-item-remove" data-index="${index}" aria-label="Видалити">&times;</button>
                 </div>
             `;
         }).join('');
 
-        if (totalAmountEl) totalAmountEl.textContent = `${total} грн`;
+        if (totalAmountEl) totalAmountEl.textContent = `${total.toFixed(2)} грн`;
+
+        // event delegation для кнопок видалення
+        container.querySelectorAll('.cart-item-remove').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const idx = parseInt(this.getAttribute('data-index'));
+                cart.splice(idx, 1);
+                localStorage.setItem('bookstore_cart', JSON.stringify(cart));
+                updateCartCount();
+                renderCartItems();
+            });
+        });
     }
 
-    window.removeFromCart = function (index) {
-        cart.splice(index, 1);
-        // localstorage видалено
-        updateCartCount();
-        renderCartItems();
-    };
+    // окрема функція removeFromCart видалена — логіка перенесена в event delegation вище
 }
 
 // ініціалізація головної сторінки
@@ -864,9 +672,9 @@ function initHomePage() {
             btn.classList.add('active');
         }
 
-        btn.addEventListener('click', function (e) {
+        btn.addEventListener('click', async function (e) {
             e.preventDefault();
-            const isAdded = toggleFavorite(bookId);
+            const isAdded = await window.toggleFavorite(bookId);
             if (isAdded) {
                 this.classList.add('active');
             } else {
@@ -882,19 +690,46 @@ function initHomePage() {
     updateCategoryCounts();
 }
 
-// обробка розсилки
 function initNewsletter() {
     const form = document.querySelector('.newsletter-form');
     if (form) {
-        form.addEventListener('submit', function (e) {
+        form.addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            // валідація
-
+            const nameInput = form.querySelector('input[name="name"]');
             const emailInput = form.querySelector('input[name="email"]');
-            if (emailInput && emailInput.value) {
-                toast.success('Дякуємо за підписку! Ми надіслали підтвердження на вашу пошту.');
-                form.reset();
+            const interestsSelect = form.querySelector('select[name="interests"]');
+            const notifCheck = form.querySelector('input[name="notifications"]');
+            const promoCheck = form.querySelector('input[name="promotions"]');
+
+            if (nameInput && emailInput && emailInput.value) {
+                try {
+                    const res = await fetch('/api/newsletter/subscribe', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: nameInput.value,
+                            email: emailInput.value,
+                            interests: interestsSelect ? interestsSelect.value : '',
+                            notifications: notifCheck ? notifCheck.checked : false,
+                            promotions: promoCheck ? promoCheck.checked : false
+                        })
+                    });
+
+                    const data = await res.json();
+                    
+                    if (res.ok) {
+                        toast.success(data.message || 'Дякуємо за підписку! Ми надіслали підтвердження на вашу пошту.');
+                        form.reset();
+                    } else {
+                        toast.error(data.error || 'Помилка при підписці.');
+                    }
+                } catch (error) {
+                    console.error('Newsletter error:', error);
+                    toast.error('Помилка з\'єднання з сервером.');
+                }
             }
         });
     }
@@ -909,22 +744,22 @@ function isFavorite(bookId) {
 }
 
 // перемикання обраного
-window.toggleFavorite = function (bookId) {
+window.toggleFavorite = async function (bookId) {
     if (typeof authSystem !== 'undefined' && authSystem.isAuthenticated()) {
-        const result = authSystem.toggleFavorite(bookId);
+        const result = await authSystem.toggleFavorite(bookId);
 
         // показати сповіщення
         if (result.success) {
-            if (result.action === 'added') {
+            if (result.isFavorite) {
                 toast.success('Книгу додано до улюблених!');
             } else {
                 toast.info('Книгу видалено з улюблених');
             }
+            return result.isFavorite;
         } else {
             toast.error(result.message);
+            return authSystem.isFavorite(bookId);
         }
-
-        return result.success && result.action === 'added';
     }
 
     toast.error('Будь ласка, увійдіть до облікового запису, щоб додати книгу до улюблених');

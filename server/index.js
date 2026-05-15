@@ -8,16 +8,17 @@ const passport = require('./config/passport-config');
 const { sequelize, User, Order, Book } = require('./models/index');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
-const studentRoutes = require('./routes/studentRoutes');
-const { renderTestPage } = require('./controllers/studentController');
 const errorLogger = require('./middlewares/errorLogger');
 const responseTimeLogger = require('./middlewares/responseTimeLogger');
 const uploadRoutes = require('./routes/uploadRoutes');
 const statusRoutes = require('./routes/statusRoutes');
 const bookRoutes = require('./routes/bookRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+const newsletterRoutes = require('./routes/newsletterRoutes');
 const morgan = require('morgan');
 
 const app = express();
+app.set('trust proxy', 1); // Trust first proxy for Render/Railway etc
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
@@ -35,45 +36,72 @@ app.use(morgan('dev'));
 app.use(responseTimeLogger);
 
 
-// завдання 2 та інтерфейс для тестування
-app.get('/', renderTestPage);
+// Serve frontend static files
+const path = require('path');
+app.use(express.static(path.join(__dirname, '../client')));
 
-// підключення маршрутів студентів
-app.use('/students', studentRoutes);
-
-// маршрути користувачів та їх замовлень тепер знаходяться в userroutes
+// Serve uploaded files (book covers etc.)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // підключення маршрутів
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/books', bookRoutes);
-app.use('/', uploadRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/newsletter', newsletterRoutes);
+app.use('/api', uploadRoutes);
 app.use('/', statusRoutes);
+
+// 404 handler for API routes
+app.use('/api', (req, res) => {
+    res.status(404).json({ error: 'Маршрут не знайдено' });
+});
+
+// Fallback to index.html for frontend routes (SPA behavior)
+app.use((req, res) => {
+    res.sendFile(path.join(__dirname, '../client/index.html'));
+});
 
 // middleware логування помилок має бути останнім
 app.use(errorLogger);
 
 // синхронізація з бд та запуск сервера
 sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
-  .then(() => sequelize.sync({ alter: true }))
+  .then(() => sequelize.sync())
   .then(() => sequelize.query('SET FOREIGN_KEY_CHECKS = 1'))
   .then(async () => {
     console.log('Підключення до бази даних через Sequelize успішне, моделі синхронізовані.');
 
-    // seed admin
-    const adminEmail = 'admin@admin.com';
+    // seed admin — надійний upsert з env-змінних
     const bcrypt = require('bcrypt');
-    let admin = await User.findOne({ where: { email: adminEmail } });
-    if (!admin) {
-      const hashedPassword = await bcrypt.hash('admin123', 10);
-      await User.create({
-        username: 'Administrator',
-        email: adminEmail,
-        password: hashedPassword,
-        role: 'admin',
-        isEmailConfirmed: true
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@admin.com';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const adminUsername = process.env.ADMIN_USERNAME || 'Administrator';
+
+    try {
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      const [admin, created] = await User.findOrCreate({
+        where: { email: adminEmail },
+        defaults: {
+          username: adminUsername,
+          password: hashedPassword,
+          role: 'admin',
+          isEmailConfirmed: true
+        }
       });
-      console.log('Created default admin: admin@admin.com / admin123');
+
+      // Якщо вже існує — примусово оновлюємо роль і підтвердження email
+      if (!created) {
+        await admin.update({
+          role: 'admin',
+          isEmailConfirmed: true
+        });
+        console.log(`Admin already exists, ensured role=admin for: ${adminEmail}`);
+      } else {
+        console.log(`Created default admin: ${adminEmail} / ${adminPassword}`);
+      }
+    } catch (err) {
+      console.error('Failed to seed admin user:', err.message);
     }
 
     // seed books
@@ -96,7 +124,7 @@ sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
       await Book.bulkCreate(SEED_BOOKS);
       console.log(`Додано ${SEED_BOOKS.length} книг до бази даних.`);
     }
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`Сервер запущено на http://localhost:${PORT}`);
     });
   }).catch(err => {

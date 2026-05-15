@@ -7,9 +7,7 @@
     <title>Каталог книг - BookStore Pro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -24,7 +22,7 @@
             </div>
             <ul class="nav-links">
                 <li><a href="index.html">Головна</a></li>
-                <li><a href="catalog.html#catalog-title">Каталог</a></li>
+                <li><a href="catalog.html" class="active">Каталог</a></li>
                 <li><a href="index.html#categories">Категорії</a></li>
                 <li id="authNavItem">
                     <a href="login.html" id="loginLink">Вхід</a>
@@ -37,21 +35,16 @@
             </ul>
             <div class="burger-menu">
                 <div class="burger-icon">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                    <span></span><span></span><span></span>
                 </div>
             </div>
         </nav>
         <div class="mobile-menu">
             <ul class="mobile-nav-links">
                 <li><a href="index.html">Головна</a></li>
-                <li><a href="catalog.html#catalog-title">Каталог</a></li>
+                <li><a href="catalog.html">Каталог</a></li>
                 <li><a href="index.html#categories">Категорії</a></li>
-
-                <li id="mobileAuthNavItem">
-                    <a href="login.html" id="mobileLoginLink">Вхід</a>
-                </li>
+                <li id="mobileAuthNavItem"><a href="login.html" id="mobileLoginLink">Вхід</a></li>
                 <li><a href="#" id="mobileCartBtn">Кошик <span id="mobileCartCount">(0)</span></a></li>
             </ul>
         </div>
@@ -59,54 +52,78 @@
 
     <main>
         <section class="catalog-section">
-            <h2 id="catalog-title">Каталог книг</h2>
+            <div class="catalog-header">
+                <h2 id="catalog-title">Каталог книг</h2>
+                <span id="resultsCount" class="results-count"></span>
+            </div>
+
             <div class="catalog-container">
-                <div class="catalog-filters">
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Пошук за назвою або автором...">
+                <!-- Фільтри -->
+                <aside class="catalog-filters">
+                    <div class="filters-header">
+                        <h3>Фільтри</h3>
+                        <button id="resetFilters" class="reset-btn">Скинути</button>
                     </div>
+
+                    <div class="filter-group search-filter-group">
+                        <label for="searchInput">Пошук</label>
+                        <div class="search-box">
+                            <svg viewBox="0 0 24 24" class="search-icon">
+                                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                            </svg>
+                            <input type="text" id="searchInput" placeholder="Пошук книги або автора..." autocomplete="off">
+                        </div>
+                    </div>
+
                     <div class="filter-group">
-                        <label for="genreFilter">Жанр:</label>
+                        <label for="genreFilter">Жанр</label>
                         <select id="genreFilter">
                             <option value="">Всі жанри</option>
                         </select>
                     </div>
+
                     <div class="filter-group">
-                        <label for="ratingFilter">Мінімальний рейтинг:</label>
+                        <label for="ratingFilter">Мінімальний рейтинг</label>
                         <select id="ratingFilter">
                             <option value="0">Всі рейтинги</option>
-                            <option value="4">4+ зірок</option>
-                            <option value="3">3+ зірок</option>
-                            <option value="2">2+ зірок</option>
-                            <option value="1">1+ зірок</option>
+                            <option value="5">★★★★★ (5)</option>
+                            <option value="4">★★★★☆ (4+)</option>
+                            <option value="3">★★★☆☆ (3+)</option>
+                            <option value="2">★★☆☆☆ (2+)</option>
                         </select>
                     </div>
+
                     <div class="filter-group">
-                        <label for="priceFilter">Ціна:</label>
+                        <label for="priceFilter">Ціна</label>
                         <select id="priceFilter">
                             <option value="">Всі ціни</option>
                             <option value="0-200">До 200 грн</option>
-                            <option value="200-400">200-400 грн</option>
-                            <option value="400-600">400-600 грн</option>
+                            <option value="200-400">200–400 грн</option>
+                            <option value="400-600">400–600 грн</option>
                             <option value="600+">Від 600 грн</option>
                         </select>
                     </div>
+
                     <div class="filter-group">
-                        <label for="sortBy">Сортувати за:</label>
+                        <label for="sortBy">Сортування</label>
                         <select id="sortBy">
-                            <option value="none">Без сортування</option>
-                            <option value="rating-desc">Рейтинг (від високого до низького)</option>
-                            <option value="rating-asc">Рейтинг (від низького до високого)</option>
+                            <option value="none">За замовчуванням</option>
+                            <option value="rating-desc">Рейтинг ↓</option>
+                            <option value="rating-asc">Рейтинг ↑</option>
+                            <option value="price-asc">Ціна ↑</option>
+                            <option value="price-desc">Ціна ↓</option>
                         </select>
                     </div>
-                    <button id="resetFilters" class="reset-btn">Скинути фільтри</button>
-                </div>
+                </aside>
+
+                <!-- Контент -->
                 <div class="catalog-content">
-                    <div id="catalogGrid" class="books-grid">
-                        <!-- список книг -->
+                    <div id="catalogGrid" class="catalog-grid">
+                        <!-- книги завантажуються через JS -->
                     </div>
-                    <div id="noResults" class="no-results" style="display: none;">
-                        <p>Книги за вашими критеріями не знайдено</p>
+                    <div id="noResults" class="no-results" style="display:none;">
+                        <p>📚 Книги за вашими критеріями не знайдено</p>
+                        <button id="resetFiltersNoResults">Скинути фільтри</button>
                     </div>
                     <div id="catalogPagination" class="catalog-pagination"></div>
                 </div>
@@ -114,23 +131,7 @@
         </section>
     </main>
 
-    <div id="bookModal" class="modal">
-        <div class="modal-backdrop"></div>
-        <div class="modal-content">
-            <button class="modal-close" aria-label="Close modal">&times;</button>
-            <div class="modal-body">
-                <img id="modalImage" src="" alt="Book Cover" class="modal-image">
-                <div class="modal-info">
-                    <p id="modalPrice" class="modal-price"></p>
-                    <h2 id="modalTitle" class="modal-title"></h2>
-                    <p id="modalAuthor" class="modal-author"></p>
-                    <p id="modalDescription" class="modal-description"></p>
-                    <button class="modal-cart-btn">В КОШИК</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- Кошик Modal -->
     <div id="cartModal" class="modal">
         <div class="modal-backdrop"></div>
         <div class="modal-content cart-modal-content">
@@ -138,10 +139,8 @@
             <div class="cart-modal-body">
                 <h2>Ваш Кошик</h2>
                 <div class="cart-items-container">
-                    <!-- елементи кошика -->
                     <p class="empty-cart-message">Ваш кошик порожній</p>
                 </div>
-                <div class="cart-pagination"></div>
                 <div class="cart-footer">
                     <div class="cart-total">
                         <span>Разом:</span>
@@ -163,16 +162,13 @@
                 <h4>Швидкі посилання</h4>
                 <ul>
                     <li><a href="index.html">Головна</a></li>
-                    <li><a href="catalog.html#catalog-title">Каталог</a></li>
-                    <li><a href="index.html#categories">Категорії</a></li>
+                    <li><a href="catalog.html">Каталог</a></li>
                     <li><a href="profile.html">Профіль</a></li>
-
                 </ul>
             </div>
             <div class="footer-section">
                 <h4>Контактна інформація</h4>
                 <p>Бураков Станіслав ІП-34</p>
-                <p>Телефон: +1 (555) 111-1111</p>
             </div>
         </div>
     </footer>
@@ -180,6 +176,7 @@
     <script src="js/toast.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/script.js"></script>
+    <script src="js/catalog.js"></script>
 </body>
 
 </html>

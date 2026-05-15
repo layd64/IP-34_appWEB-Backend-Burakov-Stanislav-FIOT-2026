@@ -39,7 +39,8 @@ const register = async (req, res, next) => {
         });
 
         // відправляємо email (перехоплюємо помилки, щоб не переривати реєстрацію)
-        const confirmUrl = `http://localhost:3000/api/auth/confirm/${confirmationToken}`;
+        const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+        const confirmUrl = `${baseUrl}/api/auth/confirm/${confirmationToken}`;
         try {
             await sendMail(email, 'Підтвердження Email', `<p>Для підтвердження пошти перейдіть за посиланням: <a href="${confirmUrl}">${confirmUrl}</a></p>`);
             console.log('Лист з підтвердженням відправлено на:', email);
@@ -186,7 +187,8 @@ const forgotPassword = async (req, res, next) => {
         user.resetPasswordExpires = Date.now() + 3600000; // 1 година
         await user.save();
 
-        const resetUrl = `http://localhost:3000/api/auth/reset/${resetToken}`;
+        const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+        const resetUrl = `${baseUrl}/api/auth/reset/${resetToken}`;
         try {
             await sendMail(email, 'Відновлення пароля', `<p>Для відновлення перейдіть за посиланням (діє 1 годину): <a href="${resetUrl}">${resetUrl}</a></p>`);
         } catch (mailErr) {
