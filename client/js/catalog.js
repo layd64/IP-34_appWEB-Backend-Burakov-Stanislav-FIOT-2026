@@ -160,8 +160,7 @@ function renderPagination(total, page, limit) {
 function showLoading() {
     const grid = document.getElementById('catalogGrid');
     grid.innerHTML = `<div class="catalog-loading">
-        <div class="loading-spinner"></div>
-        <p>Завантаження книг...</p>
+        <p>Завантаження...</p>
     </div>`;
 }
 
