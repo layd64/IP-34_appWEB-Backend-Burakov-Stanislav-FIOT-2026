@@ -41,14 +41,16 @@ const register = async (req, res, next) => {
         // відправляємо email (перехоплюємо помилки, щоб не переривати реєстрацію)
         const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
         const confirmUrl = `${baseUrl}/api/auth/confirm/${confirmationToken}`;
-        try {
-            await sendMail(email, 'Підтвердження Email', `<p>Для підтвердження пошти перейдіть за посиланням: <a href="${confirmUrl}">${confirmUrl}</a></p>`);
-            console.log('Лист з підтвердженням відправлено на:', email);
-        } catch (mailErr) {
-            console.log('\n=======================================');
-            console.error('Помилка відправки листа! Лінк для локального підтвердження:', confirmUrl);
-            console.log('=======================================\n');
-        }
+        // Виводимо лінк у консоль на випадок, якщо поштові порти заблоковано (як на Render Free Tier)
+        console.log('\n=======================================');
+        console.log(`Нова реєстрація (${email})!`);
+        console.log(`Лінк для підтвердження: ${confirmUrl}`);
+        console.log('=======================================\n');
+
+        // Відправляємо лист у фоновому режимі, щоб не блокувати запит
+        sendMail(email, 'Підтвердження Email', `<p>Для підтвердження пошти перейдіть за посиланням: <a href="${confirmUrl}">${confirmUrl}</a></p>`)
+            .then(() => console.log('Лист з підтвердженням успішно відправлено на:', email))
+            .catch(err => console.error('Помилка відправки листа (можливо, порт заблоковано провайдером).'));
 
         res.status(201).json({ message: 'Реєстрація успішна!' });
     } catch (err) {
@@ -189,11 +191,14 @@ const forgotPassword = async (req, res, next) => {
 
         const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
         const resetUrl = `${baseUrl}/api/auth/reset/${resetToken}`;
-        try {
-            await sendMail(email, 'Відновлення пароля', `<p>Для відновлення перейдіть за посиланням (діє 1 годину): <a href="${resetUrl}">${resetUrl}</a></p>`);
-        } catch (mailErr) {
-            console.log('Лінк для відновлення (оскільки email не працює):', resetUrl);
-        }
+        // Виводимо лінк у консоль для бекапу
+        console.log('\n=======================================');
+        console.log(`Запит на відновлення пароля (${email})`);
+        console.log(`Лінк для відновлення: ${resetUrl}`);
+        console.log('=======================================\n');
+
+        sendMail(email, 'Відновлення пароля', `<p>Для відновлення перейдіть за посиланням (діє 1 годину): <a href="${resetUrl}">${resetUrl}</a></p>`)
+            .catch(mailErr => console.error('Помилка відправки листа відновлення (порт заблоковано).'));
 
         res.json({ message: 'Якщо email існує, ви отримаєте лист. (Див. консоль для лінку)' });
     } catch (err) {
