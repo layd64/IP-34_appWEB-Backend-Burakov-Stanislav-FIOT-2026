@@ -1,29 +1,20 @@
 # BookStore Pro — Fullstack Web App
 
-Сучасний веб-застосунок для онлайн-магазину книг із повноцінним REST API бекендом.
+Сучасний веб-застосунок для онлайн-магазину книг із повноцінним REST API бекендом, адмін-панеллю та системою розсилок.
 
 ## Стек технологій
 
-**Бекенд:** Node.js, Express.js, MySQL (Sequelize ORM), Redis, JWT, Docker  
+**Бекенд:** Node.js, Express.js, MySQL (Sequelize ORM), Redis, JWT, Docker, Nodemailer  
 **Фронтенд:** HTML, CSS, Vanilla JS
 
-## Реалізовані вимоги лабораторної роботи
+## Реалізований функціонал
 
-| Вимога | Реалізація |
-|--------|-----------|
-| REST API (Node.js + Express) | `server/index.js`, `routes/` |
-| Захист — Helmet | `app.use(helmet())` у `index.js` |
-| Захист — Rate Limit | `middlewares/rateLimiter.js` (5 спроб / 15 хв) |
-| Валідація даних | `middlewares/validators.js`, `routes/bookRoutes.js` |
-| Кешування відповідей | Redis у `controllers/bookController.js` |
-| Оптимізація маршруту | `GET /api/books` — Redis cache (TTL 60s) |
-| Тестування API | `server.test.js` (Jest + Supertest, 11 тестів) |
-| Аналіз продуктивності | `benchmark.js` — порівняння БД vs Redis |
-| JWT-автентифікація | `middlewares/authMiddleware.js`, `controllers/authController.js` |
-| Redis-кешування | `docker-compose.yml` (redis:alpine) + `bookController.js` |
-| Swagger документація | `swagger.js`, JSDoc у всіх `routes/*.js` → `/api-docs` |
-| Docker-контейнеризація | `Dockerfile` + `docker-compose.yml` (app + MySQL + Redis) |
-| Навантажувальне тестування | Artillery: `npm run loadtest` |
+- **Клієнтська частина:** Каталог книг із "живими" лічильниками категорій, фільтрацією, сортуванням, кошиком, сторінкою профілю та сторінками авторизації.
+- **Адмін-панель:** Управління книгами, користувачами, замовленнями та інструмент для масової email-розсилки підписникам.
+- **Автентифікація:** JWT-токени (Access/Refresh), OAuth2 (вхід через Google), підтвердження пошти, відновлення пароля.
+- **Оптимізація та Безпека:** Кешування запитів у Redis, Helmet, Rate-Limit, перевірка та валідація даних.
+- **Документація:** Повністю задокументоване API у Swagger UI.
+- **Деплой:** Готове налаштування для розгортання на Render (Web Service) та підключення віддаленої БД (Aiven MySQL).
 
 ## Швидкий запуск (Docker)
 
@@ -37,19 +28,30 @@ Swagger UI: http://localhost:3000/api-docs
 
 Дефолтний адмін: `admin@admin.com` / `admin123`
 
-## Запуск без Docker
+## Запуск без Docker (Локально)
 
 ```bash
 cd server
 npm install
-# Потрібен запущений MySQL на порту 3306 і Redis на порту 6379
-npm start
+# Потрібен запущений MySQL та Redis (можна запустити локально або через Docker)
+npm run dev
 ```
+*Не забудьте створити файл `server/.env` за зразком та вказати необхідні змінні.*
+
+## Розгортання (Deployment) на Render
+
+Застосунок оптимізовано для безкоштовного хостингу **Render**. 
+Для успішного деплою вкажіть такі налаштування під час створення Web Service:
+- **Build Command:** `npm install`
+- **Start Command:** `npm start`
+- **Root Directory:** `server`
+
+Вам необхідно додати змінну `DB_URI` у форматі `mysql://user:pass@host:port/dbname?ssl-mode=REQUIRED` для підключення керованої БД (наприклад, Aiven). Завдяки спеціальним налаштуванням у `db.js`, сервер автоматично обробляє нестандартні порти та SSL сертифікати хмарних провайдерів.
 
 ## Тестування
 
 ```bash
-# Юніт-тести (Jest + Supertest) — сервер має бути запущений
+# Юніт-тести (Jest + Supertest)
 npm test
 
 # Навантажувальне тестування (Artillery)
@@ -63,11 +65,11 @@ node benchmark.js
 
 ```
 server/
-├── controllers/     # Бізнес-логіка
-├── middlewares/     # Helmet, JWT, Rate-limit, Validators, Logger
-├── models/          # Sequelize моделі (User, Order, Book)
+├── controllers/     # Бізнес-логіка (auth, books, users, newsletter)
+├── middlewares/     # Helmet, JWT, Rate-limit, Validators, FileUpload
+├── models/          # Sequelize моделі (User, Order, Book, Subscriber)
 ├── routes/          # Express маршрути зі Swagger JSDoc
-├── services/        # Поштовий сервіс
+├── services/        # Поштовий сервіс (Nodemailer)
 ├── utils/           # Winston logger
 ├── swagger.js       # Swagger конфігурація
 ├── docker-compose.yml
